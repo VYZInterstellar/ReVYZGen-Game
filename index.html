@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ReVYZGen: The Test of Focus</title>
+    
+    <!-- LINK TO YOUR ICON HERE -->
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <!-- Import Orbitron for Titles/Buttons and Rajdhani for Body Text -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Rajdhani', sans-serif;
+            color: #fff;
+            user-select: none;
+            cursor: none; /* Hide cursor by default for gameplay */
+        }
+
+        #game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: #000;
+            transition: background 1s;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .hud-text {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .counter-big {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 40px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px #00ffff;
+            transition: color 0.5s, text-shadow 0.5s;
+        }
+
+        #awareness-meter {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.1);
+            margin-top: 10px;
+            position: relative;
+        }
+
+        #awareness-fill {
+            height: 100%;
+            background: #00ffff;
+            width: 0%;
+            box-shadow: 0 0 10px #00ffff;
+            transition: width 0.2s, background 0.5s, box-shadow 0.5s;
+        }
+
+        #central-message {
+            position: absolute;
+            top: 20%; /* Moved up */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        #central-message h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            margin: 0;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            letter-spacing: 3px;
+        }
+
+        #central-message p {
+            font-size: 16px;
+            color: #fff;
+            margin-top: 5px;
+            text-shadow: 0 0 5px #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        #start-screen, #end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            transition: opacity 1s;
+            cursor: default; /* Show cursor on menu screens */
+        }
+        
+        #end-screen {
+            display: none;
+            background: linear-gradient(180deg, #000 0%, #001133 100%);
+        }
+
+        /* Title Layout Logic */
+        .logo-container {
+            display: flex;
+            gap: 0px; 
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        .logo-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; 
+        }
+
+        .logo-main {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 60px;
+            font-weight: 900;
+            background: linear-gradient(180deg, #ffffff 30%, #0088ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            letter-spacing: 0px;
+            line-height: 1;
+        }
+
+        .logo-sub {
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 10px; 
+            font-weight: 900; 
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px; 
+            margin-top: 8px;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; 
+            text-align: center;
+            
+            background: linear-gradient(90deg, #00ffff, #ffffff, #00ffff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: subShine 3s linear infinite;
+        }
+
+        @keyframes subShine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .start-btn {
+            padding: 18px 60px;
+            font-size: 18px;
+            background: transparent;
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            margin-top: 40px;
+            cursor: pointer; /* Ensure pointer on hover */
+        }
+
+        .start-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+        }
+
+        .lore-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            text-align: center;
+            color: #e0e0e0;
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .warning-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            color: #ff0033;
+            font-size: 14px;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+        }
+
+        #loader {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #555;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+    </style>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="game-container"></div>
+
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div>
+                <div class="hud-text">Target Protocol</div>
+                <div class="counter-big"><span id="caught-count">0</span> / 100</div>
+            </div>
+        </div>
+        
+        <div id="central-message">
+            <h1 id="msg-title"></h1>
+            <p id="msg-sub"></p>
+        </div>
+
+        <div style="width: 100%; text-align: center; margin-bottom: 20px;">
+            <div id="awareness-meter"><div id="awareness-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen">
+        <div class="logo-container">
+            <div class="logo-block">
+                <div class="logo-main">Re</div>
+                <div class="logo-sub">Result</div>
+            </div>
+            <div class="logo-block">
+                <div class="logo-main">VYZ</div>
+                <div class="logo-sub">Vyzverse</div>
+            </div>
+            <div class="logo-block">
+                <div class="logo-main">Gen</div>
+                <div class="logo-sub">Genesis</div>
+            </div>
+        </div>
+
+        <div class="lore-text">
+            100 Crystals - Focus
+        </div>
+        
+        <button class="start-btn" id="start-btn">Initiate</button>
+        <div id="loader">Calibrating Physics Engine...</div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen">
+        <div class="logo-container">
+            <!-- Added IDs to target these elements in JS -->
+            <div class="logo-block"><div class="logo-main" id="end-title-1" style="font-size: 40px;">SEQUENCE</div></div>
+            <div class="logo-block"><div class="logo-main" id="end-title-2" style="font-size: 40px;">COMPLETE</div></div>
+        </div>
+        <div class="lore-text" id="end-message" style="font-size: 18px;"></div>
+        <div id="ai-insight" style="margin-top: 20px; font-style: italic; color: #00ffff; max-width: 500px; text-align: center;"></div>
+        <button class="start-btn" id="restart-btn">Retry Protocol</button>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- OFFLINE "NEURAL ECHO" SYSTEM ---
+        const ACHIEVEMENT_TITLES = [
+            "SYNC 20%",
+            "SYNC 40%",
+            "SYNC 60%",
+            "SYNC 80%",
+            "SYNC 90%"
+        ];
+        
+        const ACHIEVEMENT_SUBS = [
+            "ALIGNMENT STABLE",
+            "VELOCITY INCREASING",
+            "FOCUS LOCKED",
+            "REALITY BENDING",
+            "ASCENSION IMMINENT"
+        ];
+
+        const FOUNDER_MESSAGES = [
+            "The Architect acknowledges your perfection. Welcome to the source.",
+            "You have transcended the simulation. The Vyzverse awaits your command.",
+            "Absolute resonance achieved. You are now a Pioneer of the Genesis.",
+            "The test is complete. Your consciousness has evolved."
+        ];
+
+        function getFounderMessage() {
+            return FOUNDER_MESSAGES[Math.floor(Math.random() * FOUNDER_MESSAGES.length)];
+        }
+
+        // --- Game Configuration ---
+        const CONFIG = {
+            colors: {
+                neonBlue: 0x00ffff,
+                neonRed: 0xff0033,
+                white: 0xffffff,
+                void: 0x000000
+            },
+            baseSpeed: 0.2,      
+            maxSpeed: 7.0,      // Balanced Difficulty
+            totalCrystals: 100
+        };
+
+        // --- Global Variables ---
+        let scene, camera, renderer, composer;
+        let player, playerCore, tunnel, vyztor, starSystem, spaceDebris, highSpeedParticles;
+        let crystals = []; 
+        let particleSystems = [];
+        let debrisObjects = [];
+        
+        // Game State
+        let isPlaying = false;
+        let crystalsSpawned = 0;
+        let crystalsCaught = 0;
+        let currentSpeed = CONFIG.baseSpeed;
+        let gameTime = 0;
+        let mouse = new THREE.Vector2();
+        let targetPosition = new THREE.Vector2();
+        let shakeIntensity = 0;
+        let currentStage = 0; 
+        let nextSpawnTime = 0;
+        
+        // --- NEW: Movement Bounds ---
+        let bounds = { x: 10, y: 7 }; 
+
+        // --- Initialization ---
+        function init() {
+            const container = document.getElementById('game-container');
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(CONFIG.colors.void, 0.015);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 8;
+            camera.position.y = 0; // Centered for vertical symmetry
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.toneMappingExposure = 1.5;
+            container.appendChild(renderer.domElement);
+
+            const renderScene = new RenderPass(scene, camera);
+            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass.threshold = 0.1;
+            bloomPass.strength = 2.0;
+            bloomPass.radius = 0.6;
+
+            composer = new EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            scene.add(new THREE.AmbientLight(0x111111));
+            const pointLight = new THREE.PointLight(CONFIG.colors.neonBlue, 2, 100);
+            pointLight.position.set(0, 5, 10);
+            scene.add(pointLight);
+
+            createPlayer();
+            createTunnel();
+            createVyztor();
+            createStars();
+            createSpaceDebris();
+            createHighSpeedParticles();
+            
+            // Calculate initial bounds for smooth movement
+            calculateGameBounds();
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('resize', onWindowResize);
+
+            animate();
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // Calculate screen edges to keep player visible
+        function calculateGameBounds() {
+            const dist = camera.position.z; 
+            const vFOV = THREE.MathUtils.degToRad(camera.fov); 
+            const visibleHeight = 2 * Math.tan(vFOV / 2) * dist;
+            const visibleWidth = visibleHeight * camera.aspect;
+            
+            // Keep player nicely inside the frame
+            bounds.y = (visibleHeight / 2) - 0.8; 
+            bounds.x = (visibleWidth / 2) - 0.8;
+        }
+
+        function createPlayer() {
+            player = new THREE.Group();
+
+            const coreGeo = new THREE.IcosahedronGeometry(0.4, 4);
+            const coreMat = new THREE.MeshStandardMaterial({ 
+                color: CONFIG.colors.white,
+                emissive: CONFIG.colors.neonBlue,
+                emissiveIntensity: 1,
+                roughness: 0.3,
+                metalness: 0.8,
+                wireframe: true 
+            });
+            playerCore = new THREE.Mesh(coreGeo, coreMat);
+            player.add(playerCore);
+            
+            for(let i=0; i<3; i++) {
+                const arcGeo = new THREE.TorusGeometry(0.7 + (i*0.1), 0.02, 16, 32, Math.PI + Math.random());
+                const arcMat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.neonBlue, transparent: true, opacity: 0.6 });
+                const arc = new THREE.Mesh(arcGeo, arcMat);
+                arc.rotation.x = Math.PI / 2;
+                arc.rotation.z = (Math.PI * 2 / 3) * i;
+                arc.userData = { rotSpeed: (Math.random() - 0.5) * 0.05 };
+                player.add(arc);
+            }
+
+            scene.add(player);
+        }
+
+        function createTunnel() {
+            tunnel = new THREE.Group();
+            const lineCount = 40; 
+            
+            for(let i = 0; i < lineCount; i++) {
+                const angle = (i / lineCount) * Math.PI * 2;
+                const radius = 12; 
+                const points = [];
+                for(let j = 0; j < 100; j++) {
+                    const twist = j * 0.08; 
+                    points.push(new THREE.Vector3(
+                        Math.cos(angle + twist) * radius, 
+                        Math.sin(angle + twist) * radius, 
+                        -j * 8
+                    ));
+                }
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const mat = new THREE.LineBasicMaterial({ 
+                    color: CONFIG.colors.neonBlue, 
+                    transparent: true, 
+                    opacity: 0.3,
+                    linewidth: 1
+                });
+                const line = new THREE.Line(geo, mat);
+                tunnel.add(line);
+            }
+            scene.add(tunnel);
+        }
+
+        function createVyztor() {
+            const geometry = new THREE.OctahedronGeometry(40, 1);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x000000,
+                emissive: CONFIG.colors.neonBlue,
+                emissiveIntensity: 0.2,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.5,
+            });
+            vyztor = new THREE.Mesh(geometry, material);
+            vyztor.position.z = -500;
+            scene.add(vyztor);
+        }
+
+        function createStars() {
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            for (let i = 0; i < 3000; i++) {
+                pos.push(
+                    (Math.random()-0.5)*1000, 
+                    (Math.random()-0.5)*1000, 
+                    -Math.random()*1000
+                );
+            }
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5 });
+            starSystem = new THREE.Points(geo, mat);
+            scene.add(starSystem);
+        }
+
+        function createSpaceDebris() {
+            for(let i=0; i<30; i++) {
+                const size = 1 + Math.random() * 2;
+                const geo = new THREE.TetrahedronGeometry(size);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x333333, wireframe: true, transparent: true, opacity: 0 }); // Start invisible
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                const r = 25 + Math.random() * 20;
+                const theta = Math.random() * Math.PI * 2;
+                
+                mesh.position.set(
+                    r * Math.cos(theta),
+                    r * Math.sin(theta),
+                    (Math.random() - 0.5) * 800
+                );
+                
+                mesh.userData = {
+                    rotSpeed: (Math.random()-0.5) * 0.05
+                };
+                
+                scene.add(mesh);
+                debrisObjects.push(mesh);
+            }
+        }
+
+        function createHighSpeedParticles() {
+            // Particles specifically outside the tunnel travelling very fast
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            for (let i = 0; i < 800; i++) {
+                const r = 15 + Math.random() * 40; // Strictly outside tunnel (r=12)
+                const theta = Math.random() * Math.PI * 2;
+                pos.push(
+                    r * Math.cos(theta),
+                    r * Math.sin(theta),
+                    (Math.random() - 0.5) * 1000
+                );
+            }
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ 
+                color: 0xccffff, // Bright Cyan-White
+                size: 0.8, 
+                transparent: true, 
+                opacity: 0, // Start Invisible
+                blending: THREE.AdditiveBlending
+            });
+            highSpeedParticles = new THREE.Points(geo, mat);
+            scene.add(highSpeedParticles);
+        }
+
+        function onMouseMove(e) {
+            // --- POINTER LOCK LOGIC ---
+            // If pointer is locked, we use movementX/Y for infinite scrolling
+            if (document.pointerLockElement === document.body) {
+                // Adjust sensitivity to match screen size roughly
+                const sensitivityX = 2.0 / window.innerWidth * 1.5; // 1.5 multiplier for snap
+                const sensitivityY = 2.0 / window.innerHeight * 1.5;
+
+                mouse.x += e.movementX * sensitivityX;
+                mouse.y -= e.movementY * sensitivityY; // Invert Y for 3D space
+
+                // Clamp to -1, 1 so player doesn't have to scroll back from infinity
+                mouse.x = Math.max(-1, Math.min(1, mouse.x));
+                mouse.y = Math.max(-1, Math.min(1, mouse.y));
+            } else {
+                // Fallback for menu navigation
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            }
+        }
+
+        function onTouchMove(e) {
+            e.preventDefault();
+            mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+            calculateGameBounds();
+        }
+
+        function calculateDifficulty() {
+            const progress = crystalsCaught / CONFIG.totalCrystals;
+            currentSpeed = CONFIG.baseSpeed + (progress * progress) * (CONFIG.maxSpeed - CONFIG.baseSpeed);
+            
+            // PROGRESSIVE VISIBILITY OF SCATTERED ELEMENTS
+            const chaosFactor = Math.max(0, (progress - 0.2) * 1.25); // Start appearing after 20%
+            
+            if (highSpeedParticles) {
+                highSpeedParticles.material.opacity = chaosFactor * 0.6;
+            }
+            
+            debrisObjects.forEach(obj => {
+                obj.material.opacity = chaosFactor * 0.5;
+            });
+            
+            // NOTE: Stage logic moved to spawnCrystal to sync visuals with crystal types
+        }
+
+        function updateStageVisuals() {
+            if (currentStage === 0) { 
+                tunnel.children.forEach(l => l.material.color.setHex(CONFIG.colors.neonBlue));
+                scene.fog.color.setHex(CONFIG.colors.void);
+                playerCore.material.emissive.setHex(CONFIG.colors.neonBlue);
+            } else if (currentStage === 1) { 
+                tunnel.children.forEach((l, i) => {
+                    l.material.color.setHex(i % 2 === 0 ? CONFIG.colors.neonBlue : CONFIG.colors.white);
+                });
+                playerCore.material.emissive.setHex(CONFIG.colors.white);
+            } else if (currentStage === 2) { 
+                tunnel.children.forEach(l => l.material.color.setHex(CONFIG.colors.neonRed));
+                scene.fog.color.setHex(0x110000); // Slight red fog
+                playerCore.material.emissive.setHex(CONFIG.colors.neonRed);
+            }
+        }
+
+        function spawnCrystal() {
+            if (crystalsSpawned >= CONFIG.totalCrystals) return;
+
+            crystalsSpawned++;
+            
+            // --- STRICT PERFORMANCE LOCK ---
+            // The phase change is now bound to crystalsCaught (Score), not crystalsSpawned (Time).
+            // This ensures Red NEVER appears unless the player has actually CAUGHT 90 crystals.
+            
+            let newStage = 0;
+            let color;
+
+            if (crystalsCaught >= 90) {
+                newStage = 2; // RED (Locked behind 90 caught)
+                color = CONFIG.colors.neonRed;
+            } else if (crystalsCaught >= 70) {
+                newStage = 1; // WHITE (Locked behind 70 caught)
+                color = CONFIG.colors.white;
+            } else {
+                newStage = 0; // BLUE
+                color = CONFIG.colors.neonBlue;
+            }
+
+            if (newStage !== currentStage) {
+                currentStage = newStage;
+                updateStageVisuals();
+            }
+            
+            const geo = new THREE.IcosahedronGeometry(1.2, 1);
+            const mat = new THREE.MeshBasicMaterial({ color: color, wireframe: true, transparent: true, opacity: 0.8 });
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * 8; 
+            
+            mesh.position.set(
+                Math.cos(angle) * r,
+                Math.sin(angle) * r,
+                -250 
+            );
+            
+            mesh.userData = { 
+                id: crystalsSpawned,
+                active: true,
+                rotSpeed: new THREE.Vector3(Math.random()*0.05, Math.random()*0.05, Math.random()*0.05)
+            };
+            
+            scene.add(mesh);
+            crystals.push(mesh);
+        }
+
+        function handlePlayer() {
+            // Target position uses normalized mouse (-1 to 1) scaled to visible bounds
+            targetPosition.set(mouse.x * bounds.x, mouse.y * bounds.y);
+            
+            // Smooth lerp for fluid movement
+            player.position.x += (targetPosition.x - player.position.x) * 0.4;
+            player.position.y += (targetPosition.y - player.position.y) * 0.4;
+            
+            player.rotation.z -= currentSpeed * 0.05;
+            player.rotation.x = player.position.y * 0.2;
+            player.rotation.y = player.position.x * 0.2;
+
+            // Pulse depends on Speed - Slower breathing at start
+            const pulseSpeed = 2 + (currentSpeed * 0.5);
+            const scale = 1 + Math.sin(gameTime * pulseSpeed) * 0.1;
+            playerCore.scale.set(scale, scale, scale);
+            
+            player.children.forEach(child => {
+                if(child.userData.rotSpeed) child.rotation.z += child.userData.rotSpeed;
+            });
+        }
+
+        function checkCollisions() {
+            const playerBox = new THREE.Box3().setFromObject(player);
+            playerBox.expandByScalar(-0.1);
+
+            for (let i = crystals.length - 1; i >= 0; i--) {
+                const cry = crystals[i];
+                
+                cry.position.z += currentSpeed;
+                cry.rotation.x += cry.userData.rotSpeed.x;
+                cry.rotation.y += cry.userData.rotSpeed.y;
+                cry.rotation.z += cry.userData.rotSpeed.z;
+
+                const cryBox = new THREE.Box3().setFromObject(cry);
+                
+                if (cryBox.intersectsBox(playerBox)) {
+                    catchCrystal(cry, i);
+                } 
+                else if (cry.position.z > 10) {
+                    missCrystal(cry, i);
+                }
+            }
+        }
+
+        function catchCrystal(mesh, index) {
+            createScatteredImpact(mesh.position, mesh.material.color);
+            scene.remove(mesh);
+            crystals.splice(index, 1);
+            
+            crystalsCaught++;
+            updateHUD();
+            calculateDifficulty();
+            
+            shakeIntensity = 0.6; 
+
+            // Direct Milestone Check
+            if (crystalsCaught % 20 === 0 && crystalsCaught < 100) {
+                const milestoneIndex = (crystalsCaught / 20) - 1;
+                if (milestoneIndex >= 0 && milestoneIndex < ACHIEVEMENT_TITLES.length) {
+                    showMessage(ACHIEVEMENT_TITLES[milestoneIndex], ACHIEVEMENT_SUBS[milestoneIndex], 1500);
+                }
+            } 
+
+            checkWinCondition();
+        }
+
+        function missCrystal(mesh, index) {
+            scene.remove(mesh);
+            crystals.splice(index, 1);
+            renderer.setClearColor(CONFIG.colors.neonRed, 0.3);
+            setTimeout(() => renderer.setClearColor(CONFIG.colors.void, 0), 100);
+            checkWinCondition();
+        }
+
+        function createScatteredImpact(pos, color) {
+            const particleCount = 40;
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const velocities = [];
+
+            for(let i=0; i<particleCount; i++) {
+                positions[i*3] = pos.x;
+                positions[i*3+1] = pos.y;
+                positions[i*3+2] = pos.z;
+                
+                const v = new THREE.Vector3(
+                    (Math.random() - 0.5),
+                    (Math.random() - 0.5),
+                    (Math.random() - 0.5)
+                ).normalize().multiplyScalar(Math.random() * 2 + 1); 
+                velocities.push(v);
+            }
+            
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const mat = new THREE.PointsMaterial({ 
+                color: color, 
+                size: 0.4, 
+                transparent: true, 
+                opacity: 1.0,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particles = new THREE.Points(geo, mat);
+            particles.userData = { velocities, life: 1.0, type: 'scatter' };
+            scene.add(particles);
+            particleSystems.push(particles);
+        }
+
+        function updateParticles() {
+            // Calculate decay based on speed: Faster game = Faster fade out
+            const decayRate = 0.03 + (currentSpeed * 0.025);
+
+            for(let i=particleSystems.length-1; i>=0; i--) {
+                const ps = particleSystems[i];
+                ps.userData.life -= decayRate;
+
+                if (ps.userData.type === 'scatter') {
+                    const positions = ps.geometry.attributes.position.array;
+                    for(let j=0; j<ps.userData.velocities.length; j++) {
+                        positions[j*3] += ps.userData.velocities[j].x;
+                        positions[j*3+1] += ps.userData.velocities[j].y;
+                        positions[j*3+2] += ps.userData.velocities[j].z;
+                    }
+                    ps.geometry.attributes.position.needsUpdate = true;
+                    ps.material.opacity = ps.userData.life;
+                }
+
+                if(ps.userData.life <= 0) {
+                    scene.remove(ps);
+                    particleSystems.splice(i, 1);
+                }
+            }
+        }
+
+        function updateHUD() {
+            document.getElementById('caught-count').innerText = crystalsCaught;
+            const pct = (crystalsCaught / CONFIG.totalCrystals) * 100;
+            const fill = document.getElementById('awareness-fill');
+            fill.style.width = pct + "%";
+            
+            let color;
+            if (currentStage === 2) color = CONFIG.colors.neonRed;
+            else if (currentStage === 1) color = CONFIG.colors.white; // White for Purity
+            else color = CONFIG.colors.neonBlue;
+            
+            let colorHex = "#" + color.toString(16).padStart(6, '0');
+            
+            fill.style.background = colorHex;
+            fill.style.boxShadow = `0 0 10px ${colorHex}`;
+            document.querySelector('.counter-big').style.textShadow = `0 0 20px ${colorHex}`;
+        }
+
+        function showMessage(title, sub, dur) {
+            const el = document.getElementById('central-message');
+            document.getElementById('msg-title').innerText = title;
+            document.getElementById('msg-sub').innerText = sub;
+            el.style.opacity = 0.6; // Reduced Opacity
+            setTimeout(() => el.style.opacity = 0, dur);
+        }
+
+        function checkWinCondition() {
+            if (crystalsSpawned === CONFIG.totalCrystals && crystals.length === 0) {
+                finishGame();
+            }
+        }
+
+        function finishGame() {
+            isPlaying = false;
+            
+            // Release pointer lock on game end
+            document.exitPointerLock();
+
+            const endScreen = document.getElementById('end-screen');
+            const endTitle1 = document.getElementById('end-title-1');
+            const endTitle2 = document.getElementById('end-title-2');
+            const endMsg = document.getElementById('end-message');
+            const restartBtn = document.getElementById('restart-btn');
+            const aiText = document.getElementById('ai-insight');
+
+            endScreen.style.display = 'flex';
+            endScreen.style.opacity = 0; 
+            setTimeout(() => endScreen.style.opacity = 1, 100);
+
+            if (crystalsCaught === 100) {
+                endTitle1.innerText = "ASCENSION";
+                endTitle2.innerText = "ACHIEVED";
+                
+                // Gold Gradient for Success
+                const goldGradient = "linear-gradient(180deg, #fff 0%, #ffd700 100%)";
+                endTitle1.style.background = goldGradient;
+                endTitle1.style.webkitBackgroundClip = "text";
+                endTitle1.style.webkitTextFillColor = "transparent";
+                endTitle2.style.background = goldGradient;
+                endTitle2.style.webkitBackgroundClip = "text";
+                endTitle2.style.webkitTextFillColor = "transparent";
+
+                endMsg.innerHTML = `
+                    <span style="color:#ffd700; font-size: 20px;">Perfect Resonance: 100%</span><br><br>
+                    You have proven your focus. You are ready for the true ReVYZGen.<br>
+                    Welcome to the Inner Circle, Pioneer.<br><br>
+                    <i>(The Full VYZVERSE is under construction. Your data has been noted.)</i>
+                `;
+                restartBtn.innerText = "Experience Perfection Again";
+                
+                aiText.innerText = "Decoding Founder's Frequency...";
+                
+                // Use offline generator
+                setTimeout(() => {
+                    aiText.innerText = `"${getFounderMessage()}"`;
+                }, 1000);
+
+            } else {
+                endTitle1.innerText = "SEQUENCE";
+                endTitle2.innerText = "INCOMPLETE";
+                
+                // Plain White for Failure
+                endTitle1.style.background = "none";
+                endTitle1.style.webkitTextFillColor = "#fff";
+                endTitle2.style.background = "none";
+                endTitle2.style.webkitTextFillColor = "#fff";
+
+                endMsg.innerHTML = `
+                    Fragments Collected: <b style="color:#ff0033">${crystalsCaught}</b> / 100<br><br>
+                    PORTAL LOCKED.<br>
+                    Absolute Focus Required.
+                `;
+                restartBtn.innerText = "Re-Initiate";
+                aiText.innerText = "";
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (!isPlaying) {
+                renderer.render(scene, camera);
+                if(tunnel) tunnel.rotation.z += 0.001;
+                return;
+            }
+
+            gameTime += 0.01;
+
+            if (crystalsSpawned < CONFIG.totalCrystals) {
+                nextSpawnTime--;
+                if (nextSpawnTime <= 0) {
+                    spawnCrystal();
+                    const progress = crystalsSpawned / CONFIG.totalCrystals;
+                    const spawnInterval = Math.max(20, 80 - (progress * 50));
+                    nextSpawnTime = spawnInterval + (Math.random() * 20);
+                }
+            }
+
+            if (shakeIntensity > 0) {
+                camera.position.x = (Math.random() - 0.5) * shakeIntensity;
+                camera.position.y = (Math.random() - 0.5) * shakeIntensity; // Removed the +1 offset since camera is now at 0
+                shakeIntensity -= 0.05;
+                if(shakeIntensity < 0) {
+                    shakeIntensity = 0;
+                    camera.position.x = 0;
+                    camera.position.y = 0; // Reset to 0
+                }
+            }
+
+            handlePlayer();
+            checkCollisions();
+            updateParticles();
+            
+            tunnel.rotation.z += currentSpeed * 0.001;
+
+            // BACKGROUND UPDATE
+            // 1. Space Debris - FAST
+            debrisObjects.forEach(obj => {
+                obj.position.z += currentSpeed * 2.0; 
+                obj.rotation.x += obj.userData.rotSpeed;
+                obj.rotation.y += obj.userData.rotSpeed;
+                if (obj.position.z > 10) obj.position.z = -800;
+            });
+
+            // 2. Stars - MEDIUM FAST
+            if (starSystem) {
+                starSystem.rotation.z += 0.0001;
+                const positions = starSystem.geometry.attributes.position.array;
+                for(let i=2; i<positions.length; i+=3) {
+                    positions[i] += currentSpeed * 1.5; 
+                    if(positions[i] > 10) positions[i] = -1000; 
+                }
+                starSystem.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            // 3. High Speed Particles - VERY FAST (Outside Tunnel)
+            if (highSpeedParticles) {
+                const positions = highSpeedParticles.geometry.attributes.position.array;
+                for(let i=2; i<positions.length; i+=3) {
+                    positions[i] += currentSpeed * 5.0; 
+                    if(positions[i] > 10) positions[i] = -1000;
+                }
+                highSpeedParticles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            if(vyztor) {
+                vyztor.rotation.y += 0.005;
+                let color;
+                if (currentStage === 2) color = CONFIG.colors.neonRed;
+                else if (currentStage === 1) color = CONFIG.colors.white;
+                else color = CONFIG.colors.neonBlue;
+                vyztor.material.emissive.setHex(color);
+            }
+
+            composer.render();
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            // Request Pointer Lock for infinite scrolling experience
+            document.body.requestPointerLock();
+
+            document.getElementById('start-screen').style.opacity = 0;
+            setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
+            
+            crystals.forEach(c => scene.remove(c));
+            crystals = [];
+            particleSystems.forEach(p => scene.remove(p));
+            particleSystems = [];
+            crystalsSpawned = 0;
+            crystalsCaught = 0;
+            currentSpeed = CONFIG.baseSpeed;
+            currentStage = -1; 
+            calculateDifficulty();
+            updateHUD();
+            
+            // Reset mouse to center on start
+            mouse.x = 0;
+            mouse.y = 0;
+            
+            isPlaying = true;
+            nextSpawnTime = 60; 
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', () => {
+             // Request Pointer Lock for infinite scrolling experience
+             document.body.requestPointerLock();
+
+             document.getElementById('end-screen').style.opacity = 0;
+             setTimeout(() => document.getElementById('end-screen').style.display = 'none', 1000);
+             
+            crystals.forEach(c => scene.remove(c));
+            crystals = [];
+            particleSystems.forEach(p => scene.remove(p));
+            particleSystems = [];
+            crystalsSpawned = 0;
+            crystalsCaught = 0;
+            currentSpeed = CONFIG.baseSpeed;
+            currentStage = -1;
+            calculateDifficulty();
+            updateHUD();
+
+            // Reset mouse to center on restart
+            mouse.x = 0;
+            mouse.y = 0;
+
+            isPlaying = true;
+            nextSpawnTime = 60;
+        });
+
+        init();
+
+    </script>
+</body>
+</html>
