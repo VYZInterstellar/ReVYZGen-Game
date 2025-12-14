@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ReVYZGen: The Test of Focus</title>
+    <title>VYZ Interstellar: Focus Protocol</title>
     
     <!-- LINK TO YOUR ICON HERE -->
     <link rel="icon" type="image/png" href="icon.png">
@@ -125,7 +125,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: #000; /* Set to pure black */
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -138,7 +138,7 @@
         
         #end-screen {
             display: none;
-            background: linear-gradient(180deg, #000 0%, #001133 100%);
+            background: #000; /* Set to pure black */
         }
 
         /* Title Layout Logic */
@@ -167,29 +167,36 @@
             letter-spacing: 0px;
             line-height: 1;
         }
-
-        .logo-sub {
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 10px; 
-            font-weight: 900; 
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 3px; 
-            margin-top: 8px;
-            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; 
-            text-align: center;
-            
-            background: linear-gradient(90deg, #00ffff, #ffffff, #00ffff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: subShine 3s linear infinite;
+        
+        /* Container for the staged text */
+        #staged-intro-area {
+            position: relative; /* Base for absolute children */
+            height: 100px; /* Define space for the texts */
+            width: 80vw;
+            display: flex; /* Keep flex for outer alignment */
+            align-items: center;
+            justify-content: center;
         }
 
-        @keyframes subShine {
-            to {
-                background-position: 200% center;
-            }
+        /* Styling for the staged intro text - ALL CLASSES NOW SHARE THIS CORE STYLE */
+        .intro-stage, .intro-stage-highlight, .intro-stage-title {
+            position: absolute; /* Overlap elements */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center perfectly */
+            
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 20px; 
+            font-weight: 700; 
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            /* INCREASED TRANSITION DURATION FOR CALMNESS */
+            transition: opacity 2.0s ease-in-out, color 2.0s ease-in-out, text-shadow 2.0s ease-in-out; 
+            text-align: center;
+            white-space: nowrap; /* Prevent wrapping */
         }
 
         .start-btn {
@@ -279,28 +286,20 @@
         </div>
     </div>
 
-    <!-- START SCREEN -->
+    <!-- START SCREEN (Automated and instructional) -->
     <div id="start-screen">
-        <div class="logo-container">
-            <div class="logo-block">
-                <div class="logo-main">Re</div>
-                <div class="logo-sub">Result</div>
-            </div>
-            <div class="logo-block">
-                <div class="logo-main">VYZ</div>
-                <div class="logo-sub">Vyzverse</div>
-            </div>
-            <div class="logo-block">
-                <div class="logo-main">Gen</div>
-                <div class="logo-sub">Genesis</div>
-            </div>
-        </div>
-
-        <div class="lore-text">
-            100 Crystals - Focus
+        <!-- Main central area for the staged text messages -->
+        <div id="staged-intro-area">
+            <div id="intro-line-1" class="intro-stage">PREPARING LAUNCH SEQUENCE...</div>
+            <div id="intro-line-2" class="intro-stage intro-stage-highlight"></div>
+            <div id="intro-title" class="intro-stage-title"></div>
         </div>
         
-        <button class="start-btn" id="start-btn">Initiate</button>
+        <!-- ADDED: Button for user gesture required by Pointer Lock API -->
+        <button class="start-btn" id="initial-start-btn" style="opacity: 0; pointer-events: none; margin-top: 100px;">
+            Initiate Protocol
+        </button>
+
         <div id="loader">Calibrating Physics Engine...</div>
     </div>
 
@@ -309,11 +308,12 @@
         <div class="logo-container">
             <!-- Added IDs to target these elements in JS -->
             <div class="logo-block"><div class="logo-main" id="end-title-1" style="font-size: 40px;">SEQUENCE</div></div>
-            <div class="logo-block"><div class="logo-main" id="end-title-2" style="font-size: 40px;">COMPLETE</div></div>
+            <div class="logo-block"><div class="logo-main" id="end-title-2" style="font-size: 40px;">INCOMPLETE</div></div>
         </div>
+        <!-- Updated end message structure -->
         <div class="lore-text" id="end-message" style="font-size: 18px;"></div>
         <div id="ai-insight" style="margin-top: 20px; font-style: italic; color: #00ffff; max-width: 500px; text-align: center;"></div>
-        <button class="start-btn" id="restart-btn">Retry Protocol</button>
+        <button class="start-btn" id="restart-btn">Re-Initiate Protocol</button>
     </div>
 
     <script type="module">
@@ -358,8 +358,8 @@
                 white: 0xffffff,
                 void: 0x000000
             },
-            baseSpeed: 0.2,      
-            maxSpeed: 7.0,      // Balanced Difficulty
+            baseSpeed: 0.5,      // MODIFIED: Increased for higher starting hype
+            maxSpeed: 3.0,       // Reduced Final Speed for control
             totalCrystals: 100
         };
 
@@ -369,7 +369,8 @@
         let crystals = []; 
         let particleSystems = [];
         let debrisObjects = [];
-        
+        let tunnelMaxPoints = 0; // NEW: To store max points for drawRange
+
         // Game State
         let isPlaying = false;
         let crystalsSpawned = 0;
@@ -380,7 +381,7 @@
         let targetPosition = new THREE.Vector2();
         let shakeIntensity = 0;
         let currentStage = 0; 
-        let nextSpawnTime = 0;
+        let nextSpawnCooldown = 0; 
         
         // --- NEW: Movement Bounds ---
         let bounds = { x: 10, y: 7 }; 
@@ -432,8 +433,144 @@
             document.addEventListener('touchmove', onTouchMove, { passive: false });
             window.addEventListener('resize', onWindowResize);
 
-            animate();
+            animate(); // Start the render loop immediately to show the menu/tunnel rotation
+
+            // Hide the loader text (it served its purpose)
             document.getElementById('loader').style.display = 'none';
+
+            // --- AUTOMATIC START: Start protocol after 0.5s pause ---
+            setTimeout(runIntroSequence, 500);
+        }
+
+        // Cinematic Introduction Sequence
+        function runIntroSequence() {
+            const line1 = document.getElementById('intro-line-1');
+            const line2 = document.getElementById('intro-line-2');
+            const title = document.getElementById('intro-title');
+            const introArea = document.getElementById('staged-intro-area');
+
+            // FADE_TIME is set in CSS (2000ms).
+            const VISIBLE_TIME = 2000; // Duration text is fully visible (2.0s)
+            const GAP_TIME = 1000; // Duration of pure black gap (1.0s)
+            
+            let totalDelay = 0;
+            
+            // --- Phase 1: PREPARING LAUNCH SEQUENCE... ---
+            setTimeout(() => {
+                line1.style.opacity = 1;
+            }, totalDelay);
+            totalDelay += 2000 + VISIBLE_TIME; // Fade In + Visible Time
+
+            // Fade out Phase 1
+            setTimeout(() => {
+                line1.style.opacity = 0;
+            }, totalDelay);
+            totalDelay += 2000 + GAP_TIME; // Fade Out + Gap
+
+            // --- Phase 2: FOCUS REQUIRED: 100 FRAGMENTS ---
+            setTimeout(() => {
+                line2.innerText = "FOCUS REQUIRED: 100 FRAGMENTS";
+                line2.style.opacity = 1;
+            }, totalDelay);
+            totalDelay += 2000 + VISIBLE_TIME;
+
+            // Fade out Phase 2
+            setTimeout(() => {
+                line2.style.opacity = 0;
+            }, totalDelay);
+            totalDelay += 2000 + GAP_TIME;
+
+            // --- Phase 3: VYZ INTERSTELLAR (With Bluish Flash Effect) ---
+            setTimeout(() => {
+                title.innerText = "VYZ INTERSTELLAR";
+                
+                // 1. Initial appearance (inherits white from CSS)
+                title.style.opacity = 1;
+                
+                // 2. Start the bluish flash effect after a brief delay
+                setTimeout(() => {
+                    title.style.color = '#00ffff';
+                    title.style.textShadow = '0 0 10px #00ffff, 0 0 20px #00ffff';
+                }, 500); // 0.5s into the title display
+
+                // 3. Reset the effect back to calm white before fading out
+                setTimeout(() => {
+                    title.style.color = '#fff';
+                    title.style.textShadow = '0 0 5px #fff';
+                }, 2500); // 2.5s into the title display
+                
+            }, totalDelay);
+            totalDelay += 2000 + VISIBLE_TIME;
+
+            // Fade out Phase 3
+            setTimeout(() => {
+                title.style.opacity = 0;
+            }, totalDelay);
+            totalDelay += 2000; // Just Fade Out, Portal starts immediately after.
+
+            // --- Phase 4: Tunnel Draw-Range Animation (Portal Net Creation) ---
+            setTimeout(() => {
+                introArea.style.display = 'none'; // Clear text elements
+
+                let t = 0;
+                const duration = 180; // 3.0 seconds at 60fps for a slower, more deliberate growth
+                const maxPoints = tunnelMaxPoints; // Use the stored value
+                
+                const fadeTunnel = () => {
+                    if (t < duration) {
+                        t++;
+                        // Animate drawRange.count from 0 to maxPoints.
+                        const drawCount = Math.floor((t / duration) * maxPoints); 
+                        
+                        tunnel.children.forEach(l => {
+                            l.geometry.setDrawRange(0, drawCount);
+                        });
+                        
+                        requestAnimationFrame(fadeTunnel);
+                    } else {
+                        // Ensure all lines are fully drawn
+                        tunnel.children.forEach(l => l.geometry.setDrawRange(0, maxPoints));
+                        
+                        // Reveal the initiation button, requiring a user gesture to proceed.
+                        const startBtn = document.getElementById('initial-start-btn');
+                        startBtn.style.transition = 'opacity 1s';
+                        startBtn.style.opacity = 1;
+                        startBtn.style.pointerEvents = 'auto';
+                    }
+                };
+                fadeTunnel();
+
+            }, totalDelay);
+        }
+
+        // Final Game Start Initialization
+        function startProtocol() {
+            if (isPlaying) return;
+
+            // document.body.requestPointerLock(); // REMOVED: Handled by the user click event listener
+            
+            // Remove start screen overlay after cinematic finishes
+            document.getElementById('start-screen').style.opacity = 0;
+            setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
+            
+            crystals.forEach(c => scene.remove(c));
+            crystals = [];
+            particleSystems.forEach(p => scene.remove(p));
+            particleSystems = [];
+            crystalsSpawned = 0;
+            crystalsCaught = 0;
+            currentSpeed = CONFIG.baseSpeed;
+            currentStage = -1; 
+            calculateDifficulty();
+            updateHUD();
+            
+            // Reset mouse to center on start
+            mouse.x = 0;
+            mouse.y = 0;
+            
+            isPlaying = true;
+            // MODIFIED: Start the next crystal spawn immediately (1 frame delay) for constant action
+            nextSpawnCooldown = 1; 
         }
 
         // Calculate screen edges to keep player visible
@@ -484,7 +621,8 @@
                 const angle = (i / lineCount) * Math.PI * 2;
                 const radius = 12; 
                 const points = [];
-                for(let j = 0; j < 100; j++) {
+                const segments = 100; // Store this locally for the line length
+                for(let j = 0; j < segments; j++) {
                     const twist = j * 0.08; 
                     points.push(new THREE.Vector3(
                         Math.cos(angle + twist) * radius, 
@@ -496,11 +634,20 @@
                 const mat = new THREE.LineBasicMaterial({ 
                     color: CONFIG.colors.neonBlue, 
                     transparent: true, 
-                    opacity: 0.3,
+                    opacity: 0.3, // Keep base opacity for the visual effect
                     linewidth: 1
                 });
                 const line = new THREE.Line(geo, mat);
+                
+                // CRITICAL: Start the draw range at 0 segments for the growth effect
+                line.geometry.setDrawRange(0, 0); 
+
                 tunnel.add(line);
+                
+                if (i === 0) {
+                    // Set the max number of segments (points in the array)
+                    tunnelMaxPoints = segments;
+                }
             }
             scene.add(tunnel);
         }
@@ -623,10 +770,12 @@
 
         function calculateDifficulty() {
             const progress = crystalsCaught / CONFIG.totalCrystals;
+            // Speed calculation using new, very calm range (0.5 to 3.0)
             currentSpeed = CONFIG.baseSpeed + (progress * progress) * (CONFIG.maxSpeed - CONFIG.baseSpeed);
             
-            // PROGRESSIVE VISIBILITY OF SCATTERED ELEMENTS
-            const chaosFactor = Math.max(0, (progress - 0.2) * 1.25); // Start appearing after 20%
+            // PROGRESSIVE VISIBILITY OF SCATTERED ELEMENTS (Chaos)
+            // Debris/particles remain invisible for the first 20% of crystals.
+            const chaosFactor = Math.max(0, (progress - 0.2) * 1.25); 
             
             if (highSpeedParticles) {
                 highSpeedParticles.material.opacity = chaosFactor * 0.6;
@@ -635,8 +784,6 @@
             debrisObjects.forEach(obj => {
                 obj.material.opacity = chaosFactor * 0.5;
             });
-            
-            // NOTE: Stage logic moved to spawnCrystal to sync visuals with crystal types
         }
 
         function updateStageVisuals() {
@@ -658,13 +805,11 @@
 
         function spawnCrystal() {
             if (crystalsSpawned >= CONFIG.totalCrystals) return;
+            if (crystals.length > 0) return; // CRITICAL: Only one crystal active at a time
 
             crystalsSpawned++;
             
-            // --- STRICT PERFORMANCE LOCK ---
-            // The phase change is now bound to crystalsCaught (Score), not crystalsSpawned (Time).
-            // This ensures Red NEVER appears unless the player has actually CAUGHT 90 crystals.
-            
+            // The phase change is now bound to crystalsCaught (Score).
             let newStage = 0;
             let color;
 
@@ -694,7 +839,7 @@
             mesh.position.set(
                 Math.cos(angle) * r,
                 Math.sin(angle) * r,
-                -250 
+                -250 // Reverted to far depth for "coming from the hole" effect
             );
             
             mesh.userData = { 
@@ -762,7 +907,10 @@
             calculateDifficulty();
             
             shakeIntensity = 0.6; 
-
+            
+            // --- SEAMLESS TRANSITION (No gap) ---
+            nextSpawnCooldown = 1; 
+            
             // Direct Milestone Check
             if (crystalsCaught % 20 === 0 && crystalsCaught < 100) {
                 const milestoneIndex = (crystalsCaught / 20) - 1;
@@ -779,6 +927,10 @@
             crystals.splice(index, 1);
             renderer.setClearColor(CONFIG.colors.neonRed, 0.3);
             setTimeout(() => renderer.setClearColor(CONFIG.colors.void, 0), 100);
+            
+            // --- SEAMLESS TRANSITION (No gap) ---
+            nextSpawnCooldown = 1;
+            
             checkWinCondition();
         }
 
@@ -892,26 +1044,22 @@
             setTimeout(() => endScreen.style.opacity = 1, 100);
 
             if (crystalsCaught === 100) {
-                endTitle1.innerText = "ASCENSION";
-                endTitle2.innerText = "ACHIEVED";
+                endTitle1.innerText = "ACCESS";
+                endTitle2.innerText = "GRANTED";
                 
-                // Gold Gradient for Success
-                const goldGradient = "linear-gradient(180deg, #fff 0%, #ffd700 100%)";
-                endTitle1.style.background = goldGradient;
-                endTitle1.style.webkitBackgroundClip = "text";
-                endTitle1.style.webkitTextFillColor = "transparent";
-                endTitle2.style.background = goldGradient;
-                endTitle2.style.webkitBackgroundClip = "text";
-                endTitle2.style.webkitTextFillColor = "transparent";
+                // Success styling
+                endTitle1.style.background = "none";
+                endTitle1.style.webkitBackgroundClip = "";
+                endTitle1.style.webkitTextFillColor = "#ffd700"; 
+                endTitle2.style.background = "none";
+                endTitle2.style.webkitBackgroundClip = "";
+                endTitle2.style.webkitTextFillColor = "#ffd700";
 
                 endMsg.innerHTML = `
-                    <span style="color:#ffd700; font-size: 20px;">Perfect Resonance: 100%</span><br><br>
-                    You have proven your focus. You are ready for the true ReVYZGen.<br>
-                    Welcome to the Inner Circle, Pioneer.<br><br>
-                    <i>(The Full VYZVERSE is under construction. Your data has been noted.)</i>
+                    <span style="color:#ffd700; font-size: 20px;">ACCESS PROTOCOL COMPLETE: 100%</span><br><br>
+                    Welcome to VYZ Interstellar. Your focus has been validated.<br>
                 `;
-                restartBtn.innerText = "Experience Perfection Again";
-                
+                restartBtn.innerText = "Re-Initiate Protocol";
                 aiText.innerText = "Decoding Founder's Frequency...";
                 
                 // Use offline generator
@@ -920,10 +1068,10 @@
                 }, 1000);
 
             } else {
+                // Failure styling
                 endTitle1.innerText = "SEQUENCE";
                 endTitle2.innerText = "INCOMPLETE";
                 
-                // Plain White for Failure
                 endTitle1.style.background = "none";
                 endTitle1.style.webkitTextFillColor = "#fff";
                 endTitle2.style.background = "none";
@@ -931,8 +1079,7 @@
 
                 endMsg.innerHTML = `
                     Fragments Collected: <b style="color:#ff0033">${crystalsCaught}</b> / 100<br><br>
-                    PORTAL LOCKED.<br>
-                    Absolute Focus Required.
+                    PORTAL LOCKED. **MORE FOCUS REQUIRED.**
                 `;
                 restartBtn.innerText = "Re-Initiate";
                 aiText.innerText = "";
@@ -944,30 +1091,30 @@
 
             if (!isPlaying) {
                 renderer.render(scene, camera);
-                if(tunnel) tunnel.rotation.z += 0.001;
+                // Tunnel lines rotate slowly in the background during intro/menu
+                if(tunnel) tunnel.rotation.z += 0.001; 
                 return;
             }
 
             gameTime += 0.01;
 
-            if (crystalsSpawned < CONFIG.totalCrystals) {
-                nextSpawnTime--;
-                if (nextSpawnTime <= 0) {
+            // --- SEQUENTIAL SPAWNING LOGIC (Seamless, Cooldown Controlled) ---
+            if (crystals.length === 0 && crystalsSpawned < CONFIG.totalCrystals) {
+                nextSpawnCooldown--;
+                if (nextSpawnCooldown <= 0) {
                     spawnCrystal();
-                    const progress = crystalsSpawned / CONFIG.totalCrystals;
-                    const spawnInterval = Math.max(20, 80 - (progress * 50));
-                    nextSpawnTime = spawnInterval + (Math.random() * 20);
                 }
             }
 
+
             if (shakeIntensity > 0) {
                 camera.position.x = (Math.random() - 0.5) * shakeIntensity;
-                camera.position.y = (Math.random() - 0.5) * shakeIntensity; // Removed the +1 offset since camera is now at 0
+                camera.position.y = (Math.random() - 0.5) * shakeIntensity; 
                 shakeIntensity -= 0.05;
                 if(shakeIntensity < 0) {
                     shakeIntensity = 0;
                     camera.position.x = 0;
-                    camera.position.y = 0; // Reset to 0
+                    camera.position.y = 0; 
                 }
             }
 
@@ -977,7 +1124,7 @@
             
             tunnel.rotation.z += currentSpeed * 0.001;
 
-            // BACKGROUND UPDATE
+            // BACKGROUND UPDATE (Speed dependent on collected fragments)
             // 1. Space Debris - FAST
             debrisObjects.forEach(obj => {
                 obj.position.z += currentSpeed * 2.0; 
@@ -1019,31 +1166,20 @@
             composer.render();
         }
 
-        document.getElementById('start-btn').addEventListener('click', () => {
-            // Request Pointer Lock for infinite scrolling experience
-            document.body.requestPointerLock();
+        // --- Event Handlers (Automated Start in init, only restart button needed here) ---
+        
+        // ADDED: Listener for the initial start button
+        document.getElementById('initial-start-btn').addEventListener('click', () => {
+            // A user gesture has occurred, safe to request pointer lock
+            document.body.requestPointerLock(); 
+            
+            // Hide and disable the button immediately
+            document.getElementById('initial-start-btn').style.opacity = 0;
+            document.getElementById('initial-start-btn').style.pointerEvents = 'none';
 
-            document.getElementById('start-screen').style.opacity = 0;
-            setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
-            
-            crystals.forEach(c => scene.remove(c));
-            crystals = [];
-            particleSystems.forEach(p => scene.remove(p));
-            particleSystems = [];
-            crystalsSpawned = 0;
-            crystalsCaught = 0;
-            currentSpeed = CONFIG.baseSpeed;
-            currentStage = -1; 
-            calculateDifficulty();
-            updateHUD();
-            
-            // Reset mouse to center on start
-            mouse.x = 0;
-            mouse.y = 0;
-            
-            isPlaying = true;
-            nextSpawnTime = 60; 
+            startProtocol();
         });
+
 
         document.getElementById('restart-btn').addEventListener('click', () => {
              // Request Pointer Lock for infinite scrolling experience
@@ -1063,15 +1199,20 @@
             calculateDifficulty();
             updateHUD();
 
+            // Reset draw range to zero for next play
+            tunnel.children.forEach(l => l.geometry.setDrawRange(0, tunnelMaxPoints));
+
+
             // Reset mouse to center on restart
             mouse.x = 0;
             mouse.y = 0;
 
             isPlaying = true;
-            nextSpawnTime = 60;
+            // MODIFIED: Start the next crystal spawn immediately (1 frame delay) for constant action
+            nextSpawnCooldown = 1;
         });
 
-        init();
+        window.onload = init;
 
     </script>
 </body>
