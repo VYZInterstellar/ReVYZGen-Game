@@ -1057,16 +1057,26 @@
 
                 endMsg.innerHTML = `
                     <span style="color:#ffd700; font-size: 20px;">ACCESS PROTOCOL COMPLETE: 100%</span><br><br>
-                    Welcome to VYZ Interstellar. Your focus has been validated.<br>
+                    Welcome to VYZ Interstellar. Your focus has been validated.
                 `;
-                restartBtn.innerText = "Re-Initiate Protocol";
-                aiText.innerText = "Decoding Founder's Frequency...";
                 
-                // Use offline generator
-                setTimeout(() => {
-                    aiText.innerText = `"${getFounderMessage()}"`;
-                }, 1000);
+                // --- MODIFIED CODE FOR FOUNDER INVITATION ---
+                // Using innerHTML to format the message and email link
+                aiText.innerHTML = `
+                    <p style="color:#00ffff; margin-bottom: 5px; font-weight: 700; text-transform: uppercase;">
+                        Founder's Channel Activated
+                    </p>
+                    <p style="font-style: italic; font-size: 16px; margin-top: 10px;">
+                        "Congratulations on achieving absolute synchronization. Your success journey proves you have the focus required for the VYZ Interstellar Core Team. Contact me directly to discuss your future role."
+                    </p>
+                    <p style="font-weight: 700; margin-top: 20px;">
+                        Email: <a href="mailto:founder@vyzinterstellar.com" style="color: #ffd700; text-decoration: underline;">founder@vyzinterstellar.com</a>
+                    </p>
+                `;
+                // --- END MODIFIED CODE ---
 
+                restartBtn.innerText = "Re-Initiate Protocol";
+                
             } else {
                 // Failure styling
                 endTitle1.innerText = "SEQUENCE";
