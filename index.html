@@ -7,6 +7,7 @@
     
     <!-- LINK TO YOUR ICON HERE -->
     <link rel="icon" type="image/png" href="/ReVYZGen-Game/favicon.png">
+
     <!-- Import Orbitron for Titles/Buttons and Rajdhani for Body Text -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
@@ -357,8 +358,8 @@
                 white: 0xffffff,
                 void: 0x000000
             },
-            baseSpeed: 0.5,      // MODIFIED: Increased for higher starting hype
-            maxSpeed: 3.0,       // Reduced Final Speed for control
+            baseSpeed: 0.7,      
+            maxSpeed: 2.0,      // MODIFIED: Reduced max speed for playable endgame (was 3.0)
             totalCrystals: 100
         };
 
@@ -568,7 +569,7 @@
             mouse.y = 0;
             
             isPlaying = true;
-            // MODIFIED: Start the next crystal spawn immediately (1 frame delay) for constant action
+            // Immediate spawn (1 frame delay)
             nextSpawnCooldown = 1; 
         }
 
@@ -769,7 +770,7 @@
 
         function calculateDifficulty() {
             const progress = crystalsCaught / CONFIG.totalCrystals;
-            // Speed calculation using new, very calm range (0.5 to 3.0)
+            // Speed calculation using new, clamped range (0.7 to 2.0)
             currentSpeed = CONFIG.baseSpeed + (progress * progress) * (CONFIG.maxSpeed - CONFIG.baseSpeed);
             
             // PROGRESSIVE VISIBILITY OF SCATTERED ELEMENTS (Chaos)
@@ -838,7 +839,7 @@
             mesh.position.set(
                 Math.cos(angle) * r,
                 Math.sin(angle) * r,
-                -250 // Reverted to far depth for "coming from the hole" effect
+                -120 // Crystal spawns closer for faster appearance
             );
             
             mesh.userData = { 
@@ -875,7 +876,9 @@
 
         function checkCollisions() {
             const playerBox = new THREE.Box3().setFromObject(player);
-            playerBox.expandByScalar(-0.1);
+            // MODIFIED: Expand the collision box slightly (from -0.1 to +0.1) 
+            // to ensure reliable hits at high speeds (fixing ghosting/tunneling)
+            playerBox.expandByScalar(0.1); 
 
             for (let i = crystals.length - 1; i >= 0; i--) {
                 const cry = crystals[i];
@@ -1059,8 +1062,7 @@
                     Welcome to VYZ Interstellar. Your focus has been validated.
                 `;
                 
-                // --- MODIFIED CODE FOR FOUNDER INVITATION ---
-                // Using innerHTML to format the message and email link
+                // --- FOUNDER INVITATION ---
                 aiText.innerHTML = `
                     <p style="color:#00ffff; margin-bottom: 5px; font-weight: 700; text-transform: uppercase;">
                         Founder's Channel Activated
@@ -1072,7 +1074,7 @@
                         Email: <a href="mailto:founder@vyzinterstellar.com" style="color: #ffd700; text-decoration: underline;">founder@vyzinterstellar.com</a>
                     </p>
                 `;
-                // --- END MODIFIED CODE ---
+                // --- END FOUNDER INVITATION ---
 
                 restartBtn.innerText = "Re-Initiate Protocol";
                 
@@ -1226,5 +1228,3 @@
     </script>
 </body>
 </html>
-
-
