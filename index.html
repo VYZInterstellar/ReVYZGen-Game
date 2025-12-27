@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>VYZ Interstellar: Focus Protocol</title>
     
-    <!-- LINK TO YOUR ICON HERE -->
     <link rel="icon" type="image/png" href="/ReVYZGen-Game/favicon.png">
 
-    <!-- Import Orbitron for Titles/Buttons and Rajdhani for Body Text -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -19,7 +17,8 @@
             font-family: 'Rajdhani', sans-serif;
             color: #fff;
             user-select: none;
-            cursor: none; /* Hide cursor by default for gameplay */
+            cursor: none; 
+            touch-action: none; /* Prevents browser pull-to-refresh and scrolling */
         }
 
         #game-container {
@@ -65,7 +64,7 @@
 
         .counter-big {
             font-family: 'Orbitron', sans-serif;
-            font-size: 40px;
+            font-size: clamp(24px, 8vw, 40px);
             font-weight: 700;
             color: #fff;
             text-shadow: 0 0 20px #00ffff;
@@ -90,7 +89,7 @@
 
         #central-message {
             position: absolute;
-            top: 20%; /* Moved up */
+            top: 20%; 
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
@@ -102,7 +101,7 @@
 
         #central-message h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 32px;
+            font-size: clamp(20px, 6vw, 32px);
             margin: 0;
             color: #00ffff;
             text-shadow: 0 0 20px #00ffff;
@@ -110,7 +109,7 @@
         }
 
         #central-message p {
-            font-size: 16px;
+            font-size: 14px;
             color: #fff;
             margin-top: 5px;
             text-shadow: 0 0 5px #fff;
@@ -125,7 +124,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000; /* Set to pure black */
+            background: #000;
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -133,20 +132,22 @@
             justify-content: center;
             pointer-events: auto;
             transition: opacity 1s;
-            cursor: default; /* Show cursor on menu screens */
+            cursor: default;
         }
         
         #end-screen {
             display: none;
-            background: #000; /* Set to pure black */
+            background: #000;
         }
 
-        /* Title Layout Logic */
         .logo-container {
             display: flex;
-            gap: 0px; 
-            margin-bottom: 30px;
-            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px; 
+            margin-bottom: 20px;
+            align-items: center;
+            padding: 0 20px;
         }
 
         .logo-block {
@@ -158,7 +159,7 @@
 
         .logo-main {
             font-family: 'Orbitron', sans-serif;
-            font-size: 60px;
+            font-size: clamp(32px, 10vw, 60px);
             font-weight: 900;
             background: linear-gradient(180deg, #ffffff 30%, #0088ff 100%);
             -webkit-background-clip: text;
@@ -166,42 +167,59 @@
             text-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
             letter-spacing: 0px;
             line-height: 1;
+            text-align: center;
         }
         
-        /* Container for the staged text */
         #staged-intro-area {
-            position: relative; /* Base for absolute children */
-            height: 100px; /* Define space for the texts */
-            width: 80vw;
-            display: flex; /* Keep flex for outer alignment */
+            position: relative;
+            height: 120px; 
+            width: 90vw;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Styling for the staged intro text - ALL CLASSES NOW SHARE THIS CORE STYLE */
         .intro-stage, .intro-stage-highlight, .intro-stage-title {
-            position: absolute; /* Overlap elements */
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Center perfectly */
-            
+            transform: translate(-50%, -50%);
+            width: 100%; 
             font-family: 'Orbitron', sans-serif; 
-            font-size: 20px; 
+            font-size: clamp(14px, 4.5vw, 22px); 
             font-weight: 700; 
             color: #fff;
-            text-shadow: 0 0 5px #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: clamp(1px, 0.5vw, 3px);
             opacity: 0;
-            /* INCREASED TRANSITION DURATION FOR CALMNESS */
             transition: opacity 2.0s ease-in-out, color 2.0s ease-in-out, text-shadow 2.0s ease-in-out; 
             text-align: center;
-            white-space: nowrap; /* Prevent wrapping */
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .intro-detail {
+            display: block;
+            font-size: 0.65em;
+            opacity: 0.6;
+            letter-spacing: 5px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* BUTTONS */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
         }
 
         .start-btn {
-            padding: 18px 60px;
-            font-size: 18px;
+            padding: 16px clamp(30px, 10vw, 60px);
+            font-size: clamp(14px, 4vw, 18px);
             background: transparent;
             color: #00ffff;
             border: 2px solid #00ffff;
@@ -212,8 +230,6 @@
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            margin-top: 40px;
-            cursor: pointer; /* Ensure pointer on hover */
         }
 
         .start-btn:hover {
@@ -222,25 +238,43 @@
             box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
         }
 
-        .lore-text {
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 500;
-            text-align: center;
-            color: #e0e0e0;
-            font-size: 24px;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-        
-        .warning-text {
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            color: #ff0033;
-            font-size: 14px;
-            margin-top: 10px;
-            letter-spacing: 2px;
+        .cortex-btn {
+            padding: 18px 50px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
             text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255, 0, 51, 0.4);
+            letter-spacing: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s;
+            display: none; /* Only visible on win */
+        }
+
+        .cortex-btn:hover {
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+            transform: scale(1.05);
+        }
+
+        .secondary-btn {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            background: transparent;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .secondary-btn:hover {
+            color: #fff;
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         #loader {
@@ -286,16 +320,13 @@
         </div>
     </div>
 
-    <!-- START SCREEN (Automated and instructional) -->
     <div id="start-screen">
-        <!-- Main central area for the staged text messages -->
         <div id="staged-intro-area">
             <div id="intro-line-1" class="intro-stage">PREPARING LAUNCH SEQUENCE...</div>
             <div id="intro-line-2" class="intro-stage intro-stage-highlight"></div>
             <div id="intro-title" class="intro-stage-title"></div>
         </div>
         
-        <!-- ADDED: Button for user gesture required by Pointer Lock API -->
         <button class="start-btn" id="initial-start-btn" style="opacity: 0; pointer-events: none; margin-top: 100px;">
             Initiate Protocol
         </button>
@@ -303,17 +334,19 @@
         <div id="loader">Calibrating Physics Engine...</div>
     </div>
 
-    <!-- END SCREEN -->
     <div id="end-screen">
         <div class="logo-container">
-            <!-- Added IDs to target these elements in JS -->
-            <div class="logo-block"><div class="logo-main" id="end-title-1" style="font-size: 40px;">SEQUENCE</div></div>
-            <div class="logo-block"><div class="logo-main" id="end-title-2" style="font-size: 40px;">INCOMPLETE</div></div>
+            <div class="logo-block"><div class="logo-main" id="end-title-1" style="font-size: clamp(30px, 8vw, 40px);">SEQUENCE</div></div>
+            <div class="logo-block"><div class="logo-main" id="end-title-2" style="font-size: clamp(30px, 8vw, 40px);">INCOMPLETE</div></div>
         </div>
-        <!-- Updated end message structure -->
-        <div class="lore-text" id="end-message" style="font-size: 18px;"></div>
-        <div id="ai-insight" style="margin-top: 20px; font-style: italic; color: #00ffff; max-width: 500px; text-align: center;"></div>
-        <button class="start-btn" id="restart-btn">Re-Initiate Protocol</button>
+        
+        <div id="end-message" style="margin-bottom: 10px;"></div>
+        <div id="ai-insight" style="margin-bottom: 20px; color: #fff; max-width: 500px; text-align: center; padding: 0 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;"></div>
+        
+        <div class="btn-container">
+            <button class="cortex-btn" id="connect-cortex-btn">Connect to Cortex</button>
+            <button class="start-btn" id="restart-btn">Re-Initiate Protocol</button>
+        </div>
     </div>
 
     <script type="module">
@@ -322,57 +355,26 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // --- OFFLINE "NEURAL ECHO" SYSTEM ---
-        const ACHIEVEMENT_TITLES = [
-            "SYNC 20%",
-            "SYNC 40%",
-            "SYNC 60%",
-            "SYNC 80%",
-            "SYNC 90%"
-        ];
-        
-        const ACHIEVEMENT_SUBS = [
-            "ALIGNMENT STABLE",
-            "VELOCITY INCREASING",
-            "FOCUS LOCKED",
-            "REALITY BENDING",
-            "ASCENSION IMMINENT"
-        ];
+        const ACHIEVEMENT_TITLES = ["SYNC 20%", "SYNC 40%", "SYNC 60%", "SYNC 80%", "SYNC 90%"];
+        const ACHIEVEMENT_SUBS = ["ALIGNMENT STABLE", "VELOCITY INCREASING", "FOCUS LOCKED", "REALITY BENDING", "ASCENSION IMMINENT"];
 
-        const FOUNDER_MESSAGES = [
-            "The Architect acknowledges your perfection. Welcome to the source.",
-            "You have transcended the simulation. The Vyzverse awaits your command.",
-            "Absolute resonance achieved. You are now a Pioneer of the Genesis.",
-            "The test is complete. Your consciousness has evolved."
-        ];
-
-        function getFounderMessage() {
-            return FOUNDER_MESSAGES[Math.floor(Math.random() * FOUNDER_MESSAGES.length)];
-        }
-
-        // --- Game Configuration ---
         const CONFIG = {
-            colors: {
-                neonBlue: 0x00ffff,
-                neonRed: 0xff0033,
-                white: 0xffffff,
-                void: 0x000000
-            },
-            baseSpeed: 0.7,      
-            maxSpeed: 2.0,      // MODIFIED: Reduced max speed for playable endgame (was 3.0)
-            totalCrystals: 100
+            colors: { neonBlue: 0x00ffff, neonRed: 0xff0033, white: 0xffffff, gold: 0xffd700, void: 0x000000 },
+            baseSpeed: 1.1,
+            maxSpeed: 3.5,
+            totalCrystals: 100,
+            winnerEmail: 'cortex@vyzinterstellar.com'
         };
 
-        // --- Global Variables ---
-        let scene, camera, renderer, composer;
+        let scene, camera, renderer, composer, bloomPass, clock;
         let player, playerCore, tunnel, vyztor, starSystem, spaceDebris, highSpeedParticles;
         let crystals = []; 
         let particleSystems = [];
         let debrisObjects = [];
-        let tunnelMaxPoints = 0; // NEW: To store max points for drawRange
+        let tunnelMaxPoints = 0;
 
-        // Game State
         let isPlaying = false;
+        let isAscending = false;
         let crystalsSpawned = 0;
         let crystalsCaught = 0;
         let currentSpeed = CONFIG.baseSpeed;
@@ -382,11 +384,13 @@
         let shakeIntensity = 0;
         let currentStage = 0; 
         let nextSpawnCooldown = 0; 
-        
-        // --- NEW: Movement Bounds ---
         let bounds = { x: 10, y: 7 }; 
 
-        // --- Initialization ---
+        // Touch handling variables for relative movement
+        let isTouching = false;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+
         function init() {
             const container = document.getElementById('game-container');
 
@@ -395,7 +399,7 @@
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 8;
-            camera.position.y = 0; // Centered for vertical symmetry
+            camera.position.y = 0;
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -404,8 +408,10 @@
             renderer.toneMappingExposure = 1.5;
             container.appendChild(renderer.domElement);
 
+            clock = new THREE.Clock();
+
             const renderScene = new RenderPass(scene, camera);
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
             bloomPass.threshold = 0.1;
             bloomPass.strength = 2.0;
             bloomPass.radius = 0.6;
@@ -426,130 +432,89 @@
             createSpaceDebris();
             createHighSpeedParticles();
             
-            // Calculate initial bounds for smooth movement
             calculateGameBounds();
 
+            // Event Listeners
             document.addEventListener('mousemove', onMouseMove);
+            
+            // Modern Touch Listeners
+            document.addEventListener('touchstart', onTouchStart, { passive: false });
             document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onTouchEnd, { passive: false });
+            
             window.addEventListener('resize', onWindowResize);
 
-            animate(); // Start the render loop immediately to show the menu/tunnel rotation
-
-            // Hide the loader text (it served its purpose)
+            animate();
             document.getElementById('loader').style.display = 'none';
-
-            // --- AUTOMATIC START: Start protocol after 0.5s pause ---
             setTimeout(runIntroSequence, 500);
         }
 
-        // Cinematic Introduction Sequence
         function runIntroSequence() {
             const line1 = document.getElementById('intro-line-1');
             const line2 = document.getElementById('intro-line-2');
             const title = document.getElementById('intro-title');
             const introArea = document.getElementById('staged-intro-area');
 
-            // FADE_TIME is set in CSS (2000ms).
-            const VISIBLE_TIME = 2000; // Duration text is fully visible (2.0s)
-            const GAP_TIME = 1000; // Duration of pure black gap (1.0s)
+            const VISIBLE_TIME = 2000; 
+            const GAP_TIME = 1000; 
             
             let totalDelay = 0;
             
-            // --- Phase 1: PREPARING LAUNCH SEQUENCE... ---
-            setTimeout(() => {
-                line1.style.opacity = 1;
-            }, totalDelay);
-            totalDelay += 2000 + VISIBLE_TIME; // Fade In + Visible Time
+            setTimeout(() => { line1.style.opacity = 1; }, totalDelay);
+            totalDelay += 2000 + VISIBLE_TIME;
 
-            // Fade out Phase 1
-            setTimeout(() => {
-                line1.style.opacity = 0;
-            }, totalDelay);
-            totalDelay += 2000 + GAP_TIME; // Fade Out + Gap
+            setTimeout(() => { line1.style.opacity = 0; }, totalDelay);
+            totalDelay += 2000 + GAP_TIME;
 
-            // --- Phase 2: FOCUS REQUIRED: 100 FRAGMENTS ---
             setTimeout(() => {
-                line2.innerText = "FOCUS REQUIRED: 100 FRAGMENTS";
+                line2.innerHTML = `FOCUS REQUIRED <span class="intro-detail">100 FRAGMENTS</span>`;
                 line2.style.opacity = 1;
             }, totalDelay);
             totalDelay += 2000 + VISIBLE_TIME;
 
-            // Fade out Phase 2
-            setTimeout(() => {
-                line2.style.opacity = 0;
-            }, totalDelay);
+            setTimeout(() => { line2.style.opacity = 0; }, totalDelay);
             totalDelay += 2000 + GAP_TIME;
 
-            // --- Phase 3: VYZ INTERSTELLAR (With Bluish Flash Effect) ---
             setTimeout(() => {
                 title.innerText = "VYZ INTERSTELLAR";
-                
-                // 1. Initial appearance (inherits white from CSS)
                 title.style.opacity = 1;
-                
-                // 2. Start the bluish flash effect after a brief delay
                 setTimeout(() => {
                     title.style.color = '#00ffff';
                     title.style.textShadow = '0 0 10px #00ffff, 0 0 20px #00ffff';
-                }, 500); // 0.5s into the title display
-
-                // 3. Reset the effect back to calm white before fading out
-                setTimeout(() => {
-                    title.style.color = '#fff';
-                    title.style.textShadow = '0 0 5px #fff';
-                }, 2500); // 2.5s into the title display
-                
+                }, 500);
             }, totalDelay);
             totalDelay += 2000 + VISIBLE_TIME;
 
-            // Fade out Phase 3
-            setTimeout(() => {
-                title.style.opacity = 0;
-            }, totalDelay);
-            totalDelay += 2000; // Just Fade Out, Portal starts immediately after.
+            setTimeout(() => { title.style.opacity = 0; }, totalDelay);
+            totalDelay += 2000; 
 
-            // --- Phase 4: Tunnel Draw-Range Animation (Portal Net Creation) ---
             setTimeout(() => {
-                introArea.style.display = 'none'; // Clear text elements
-
+                introArea.style.display = 'none';
                 let t = 0;
-                const duration = 180; // 3.0 seconds at 60fps for a slower, more deliberate growth
-                const maxPoints = tunnelMaxPoints; // Use the stored value
+                const duration = 180; 
+                const maxPoints = tunnelMaxPoints;
                 
                 const fadeTunnel = () => {
                     if (t < duration) {
                         t++;
-                        // Animate drawRange.count from 0 to maxPoints.
                         const drawCount = Math.floor((t / duration) * maxPoints); 
-                        
                         tunnel.children.forEach(l => {
                             l.geometry.setDrawRange(0, drawCount);
                         });
-                        
                         requestAnimationFrame(fadeTunnel);
                     } else {
-                        // Ensure all lines are fully drawn
                         tunnel.children.forEach(l => l.geometry.setDrawRange(0, maxPoints));
-                        
-                        // Reveal the initiation button, requiring a user gesture to proceed.
                         const startBtn = document.getElementById('initial-start-btn');
-                        startBtn.style.transition = 'opacity 1s';
                         startBtn.style.opacity = 1;
                         startBtn.style.pointerEvents = 'auto';
                     }
                 };
                 fadeTunnel();
-
             }, totalDelay);
         }
 
-        // Final Game Start Initialization
         function startProtocol() {
             if (isPlaying) return;
-
-            // document.body.requestPointerLock(); // REMOVED: Handled by the user click event listener
-            
-            // Remove start screen overlay after cinematic finishes
             document.getElementById('start-screen').style.opacity = 0;
             setTimeout(() => document.getElementById('start-screen').style.display = 'none', 1000);
             
@@ -561,41 +526,35 @@
             crystalsCaught = 0;
             currentSpeed = CONFIG.baseSpeed;
             currentStage = -1; 
+            isAscending = false;
+            camera.fov = 75;
+            camera.updateProjectionMatrix();
+            bloomPass.strength = 2.0;
+
             calculateDifficulty();
             updateHUD();
             
-            // Reset mouse to center on start
-            mouse.x = 0;
-            mouse.y = 0;
-            
+            mouse.x = 0; mouse.y = 0;
             isPlaying = true;
-            // Immediate spawn (1 frame delay)
             nextSpawnCooldown = 1; 
+            clock.start();
         }
 
-        // Calculate screen edges to keep player visible
         function calculateGameBounds() {
             const dist = camera.position.z; 
             const vFOV = THREE.MathUtils.degToRad(camera.fov); 
             const visibleHeight = 2 * Math.tan(vFOV / 2) * dist;
             const visibleWidth = visibleHeight * camera.aspect;
-            
-            // Keep player nicely inside the frame
             bounds.y = (visibleHeight / 2) - 0.8; 
             bounds.x = (visibleWidth / 2) - 0.8;
         }
 
         function createPlayer() {
             player = new THREE.Group();
-
             const coreGeo = new THREE.IcosahedronGeometry(0.4, 4);
             const coreMat = new THREE.MeshStandardMaterial({ 
-                color: CONFIG.colors.white,
-                emissive: CONFIG.colors.neonBlue,
-                emissiveIntensity: 1,
-                roughness: 0.3,
-                metalness: 0.8,
-                wireframe: true 
+                color: CONFIG.colors.white, emissive: CONFIG.colors.neonBlue,
+                emissiveIntensity: 1, roughness: 0.3, metalness: 0.8, wireframe: true 
             });
             playerCore = new THREE.Mesh(coreGeo, coreMat);
             player.add(playerCore);
@@ -609,19 +568,19 @@
                 arc.userData = { rotSpeed: (Math.random() - 0.5) * 0.05 };
                 player.add(arc);
             }
-
             scene.add(player);
         }
 
         function createTunnel() {
             tunnel = new THREE.Group();
             const lineCount = 40; 
-            
+            const segments = 100;
+            tunnelMaxPoints = segments;
+
             for(let i = 0; i < lineCount; i++) {
                 const angle = (i / lineCount) * Math.PI * 2;
                 const radius = 12; 
                 const points = [];
-                const segments = 100; // Store this locally for the line length
                 for(let j = 0; j < segments; j++) {
                     const twist = j * 0.08; 
                     points.push(new THREE.Vector3(
@@ -632,22 +591,11 @@
                 }
                 const geo = new THREE.BufferGeometry().setFromPoints(points);
                 const mat = new THREE.LineBasicMaterial({ 
-                    color: CONFIG.colors.neonBlue, 
-                    transparent: true, 
-                    opacity: 0.3, // Keep base opacity for the visual effect
-                    linewidth: 1
+                    color: CONFIG.colors.neonBlue, transparent: true, opacity: 0.3, linewidth: 1
                 });
                 const line = new THREE.Line(geo, mat);
-                
-                // CRITICAL: Start the draw range at 0 segments for the growth effect
                 line.geometry.setDrawRange(0, 0); 
-
                 tunnel.add(line);
-                
-                if (i === 0) {
-                    // Set the max number of segments (points in the array)
-                    tunnelMaxPoints = segments;
-                }
             }
             scene.add(tunnel);
         }
@@ -655,12 +603,8 @@
         function createVyztor() {
             const geometry = new THREE.OctahedronGeometry(40, 1);
             const material = new THREE.MeshStandardMaterial({ 
-                color: 0x000000,
-                emissive: CONFIG.colors.neonBlue,
-                emissiveIntensity: 0.2,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.5,
+                color: 0x000000, emissive: CONFIG.colors.neonBlue, emissiveIntensity: 0.2,
+                wireframe: true, transparent: true, opacity: 0.5,
             });
             vyztor = new THREE.Mesh(geometry, material);
             vyztor.position.z = -500;
@@ -671,93 +615,87 @@
             const geo = new THREE.BufferGeometry();
             const pos = [];
             for (let i = 0; i < 3000; i++) {
-                pos.push(
-                    (Math.random()-0.5)*1000, 
-                    (Math.random()-0.5)*1000, 
-                    -Math.random()*1000
-                );
+                pos.push((Math.random()-0.5)*1000, (Math.random()-0.5)*1000, -Math.random()*1000);
             }
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5 });
-            starSystem = new THREE.Points(geo, mat);
+            starSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5 }));
             scene.add(starSystem);
         }
 
         function createSpaceDebris() {
             for(let i=0; i<30; i++) {
                 const size = 1 + Math.random() * 2;
-                const geo = new THREE.TetrahedronGeometry(size);
-                const mat = new THREE.MeshBasicMaterial({ color: 0x333333, wireframe: true, transparent: true, opacity: 0 }); // Start invisible
-                const mesh = new THREE.Mesh(geo, mat);
-                
+                const mesh = new THREE.Mesh(new THREE.TetrahedronGeometry(size), new THREE.MeshBasicMaterial({ color: 0x333333, wireframe: true, transparent: true, opacity: 0 }));
                 const r = 25 + Math.random() * 20;
                 const theta = Math.random() * Math.PI * 2;
-                
-                mesh.position.set(
-                    r * Math.cos(theta),
-                    r * Math.sin(theta),
-                    (Math.random() - 0.5) * 800
-                );
-                
-                mesh.userData = {
-                    rotSpeed: (Math.random()-0.5) * 0.05
-                };
-                
+                mesh.position.set(r * Math.cos(theta), r * Math.sin(theta), (Math.random() - 0.5) * 800);
+                mesh.userData = { rotSpeed: (Math.random()-0.5) * 0.05 };
                 scene.add(mesh);
                 debrisObjects.push(mesh);
             }
         }
 
         function createHighSpeedParticles() {
-            // Particles specifically outside the tunnel travelling very fast
             const geo = new THREE.BufferGeometry();
             const pos = [];
             for (let i = 0; i < 800; i++) {
-                const r = 15 + Math.random() * 40; // Strictly outside tunnel (r=12)
+                const r = 15 + Math.random() * 40;
                 const theta = Math.random() * Math.PI * 2;
-                pos.push(
-                    r * Math.cos(theta),
-                    r * Math.sin(theta),
-                    (Math.random() - 0.5) * 1000
-                );
+                pos.push(r * Math.cos(theta), r * Math.sin(theta), (Math.random() - 0.5) * 1000);
             }
             geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            const mat = new THREE.PointsMaterial({ 
-                color: 0xccffff, // Bright Cyan-White
-                size: 0.8, 
-                transparent: true, 
-                opacity: 0, // Start Invisible
-                blending: THREE.AdditiveBlending
-            });
-            highSpeedParticles = new THREE.Points(geo, mat);
+            highSpeedParticles = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xccffff, size: 0.8, transparent: true, opacity: 0, blending: THREE.AdditiveBlending }));
             scene.add(highSpeedParticles);
         }
 
         function onMouseMove(e) {
-            // --- POINTER LOCK LOGIC ---
-            // If pointer is locked, we use movementX/Y for infinite scrolling
             if (document.pointerLockElement === document.body) {
-                // Adjust sensitivity to match screen size roughly
-                const sensitivityX = 2.0 / window.innerWidth * 1.5; // 1.5 multiplier for snap
+                const sensitivityX = 2.0 / window.innerWidth * 1.5;
                 const sensitivityY = 2.0 / window.innerHeight * 1.5;
-
-                mouse.x += e.movementX * sensitivityX;
-                mouse.y -= e.movementY * sensitivityY; // Invert Y for 3D space
-
-                // Clamp to -1, 1 so player doesn't have to scroll back from infinity
-                mouse.x = Math.max(-1, Math.min(1, mouse.x));
-                mouse.y = Math.max(-1, Math.min(1, mouse.y));
-            } else {
-                // Fallback for menu navigation
+                mouse.x = Math.max(-1, Math.min(1, mouse.x + e.movementX * sensitivityX));
+                mouse.y = Math.max(-1, Math.min(1, mouse.y - e.movementY * sensitivityY));
+            } else if (!isTouching) {
+                // Only use absolute mapping if not on mobile/touching
                 mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
                 mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
             }
         }
 
+        // TOUCH HANDLING: Relative Movement Logic
+        function onTouchStart(e) {
+            if (e.touches.length > 0) {
+                isTouching = true;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
+        }
+
         function onTouchMove(e) {
-            e.preventDefault();
-            mouse.x = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+            if (e.touches.length > 0 && isPlaying) {
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const dx = touch.clientX - lastTouchX;
+                const dy = touch.clientY - lastTouchY;
+
+                // Sensitivity factor: High enough to reach corners easily
+                const sensitivity = 2.5 / Math.min(window.innerWidth, window.innerHeight);
+
+                // Update normalized mouse coordinates relatively
+                mouse.x += dx * sensitivity;
+                mouse.y -= dy * sensitivity;
+
+                // Clamp values between -1 and 1
+                mouse.x = Math.max(-1, Math.min(1, mouse.x));
+                mouse.y = Math.max(-1, Math.min(1, mouse.y));
+
+                lastTouchX = touch.clientX;
+                lastTouchY = touch.clientY;
+            }
+        }
+
+        function onTouchEnd(e) {
+            isTouching = false;
         }
 
         function onWindowResize() {
@@ -770,20 +708,10 @@
 
         function calculateDifficulty() {
             const progress = crystalsCaught / CONFIG.totalCrystals;
-            // Speed calculation using new, clamped range (0.7 to 2.0)
             currentSpeed = CONFIG.baseSpeed + (progress * progress) * (CONFIG.maxSpeed - CONFIG.baseSpeed);
-            
-            // PROGRESSIVE VISIBILITY OF SCATTERED ELEMENTS (Chaos)
-            // Debris/particles remain invisible for the first 20% of crystals.
             const chaosFactor = Math.max(0, (progress - 0.2) * 1.25); 
-            
-            if (highSpeedParticles) {
-                highSpeedParticles.material.opacity = chaosFactor * 0.6;
-            }
-            
-            debrisObjects.forEach(obj => {
-                obj.material.opacity = chaosFactor * 0.5;
-            });
+            if (highSpeedParticles) highSpeedParticles.material.opacity = chaosFactor * 0.6;
+            debrisObjects.forEach(obj => { obj.material.opacity = chaosFactor * 0.5; });
         }
 
         function updateStageVisuals() {
@@ -792,108 +720,64 @@
                 scene.fog.color.setHex(CONFIG.colors.void);
                 playerCore.material.emissive.setHex(CONFIG.colors.neonBlue);
             } else if (currentStage === 1) { 
-                tunnel.children.forEach((l, i) => {
-                    l.material.color.setHex(i % 2 === 0 ? CONFIG.colors.neonBlue : CONFIG.colors.white);
-                });
+                tunnel.children.forEach((l, i) => { l.material.color.setHex(i % 2 === 0 ? CONFIG.colors.neonBlue : CONFIG.colors.white); });
                 playerCore.material.emissive.setHex(CONFIG.colors.white);
             } else if (currentStage === 2) { 
                 tunnel.children.forEach(l => l.material.color.setHex(CONFIG.colors.neonRed));
-                scene.fog.color.setHex(0x110000); // Slight red fog
+                scene.fog.color.setHex(0x110000); 
                 playerCore.material.emissive.setHex(CONFIG.colors.neonRed);
             }
         }
 
         function spawnCrystal() {
-            if (crystalsSpawned >= CONFIG.totalCrystals) return;
-            if (crystals.length > 0) return; // CRITICAL: Only one crystal active at a time
-
+            if (crystalsSpawned >= CONFIG.totalCrystals || crystals.length > 0) return;
             crystalsSpawned++;
-            
-            // The phase change is now bound to crystalsCaught (Score).
-            let newStage = 0;
-            let color;
-
-            if (crystalsCaught >= 90) {
-                newStage = 2; // RED (Locked behind 90 caught)
-                color = CONFIG.colors.neonRed;
-            } else if (crystalsCaught >= 70) {
-                newStage = 1; // WHITE (Locked behind 70 caught)
-                color = CONFIG.colors.white;
-            } else {
-                newStage = 0; // BLUE
-                color = CONFIG.colors.neonBlue;
-            }
+            let newStage = crystalsCaught >= 90 ? 2 : (crystalsCaught >= 70 ? 1 : 0);
+            let color = [CONFIG.colors.neonBlue, CONFIG.colors.white, CONFIG.colors.neonRed][newStage];
 
             if (newStage !== currentStage) {
                 currentStage = newStage;
                 updateStageVisuals();
             }
             
-            const geo = new THREE.IcosahedronGeometry(1.2, 1);
-            const mat = new THREE.MeshBasicMaterial({ color: color, wireframe: true, transparent: true, opacity: 0.8 });
-            const mesh = new THREE.Mesh(geo, mat);
-            
+            const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), new THREE.MeshBasicMaterial({ color: color, wireframe: true, transparent: true, opacity: 0.8 }));
             const angle = Math.random() * Math.PI * 2;
             const r = Math.random() * 8; 
-            
-            mesh.position.set(
-                Math.cos(angle) * r,
-                Math.sin(angle) * r,
-                -120 // Crystal spawns closer for faster appearance
-            );
-            
-            mesh.userData = { 
-                id: crystalsSpawned,
-                active: true,
-                rotSpeed: new THREE.Vector3(Math.random()*0.05, Math.random()*0.05, Math.random()*0.05)
-            };
-            
+            mesh.position.set(Math.cos(angle) * r, Math.sin(angle) * r, -120);
+            mesh.userData = { id: crystalsSpawned, rotSpeed: new THREE.Vector3(Math.random()*0.05, Math.random()*0.05, Math.random()*0.05) };
             scene.add(mesh);
             crystals.push(mesh);
         }
 
-        function handlePlayer() {
-            // Target position uses normalized mouse (-1 to 1) scaled to visible bounds
+        function handlePlayer(dt) {
             targetPosition.set(mouse.x * bounds.x, mouse.y * bounds.y);
-            
-            // Smooth lerp for fluid movement
-            player.position.x += (targetPosition.x - player.position.x) * 0.4;
-            player.position.y += (targetPosition.y - player.position.y) * 0.4;
-            
-            player.rotation.z -= currentSpeed * 0.05;
+            const lerpFactor = 1 - Math.pow(0.001, dt); 
+            player.position.x += (targetPosition.x - player.position.x) * lerpFactor;
+            player.position.y += (targetPosition.y - player.position.y) * lerpFactor;
+
+            player.rotation.z -= currentSpeed * 0.05 * dt * 60;
             player.rotation.x = player.position.y * 0.2;
             player.rotation.y = player.position.x * 0.2;
-
-            // Pulse depends on Speed - Slower breathing at start
-            const pulseSpeed = 2 + (currentSpeed * 0.5);
-            const scale = 1 + Math.sin(gameTime * pulseSpeed) * 0.1;
-            playerCore.scale.set(scale, scale, scale);
             
-            player.children.forEach(child => {
-                if(child.userData.rotSpeed) child.rotation.z += child.userData.rotSpeed;
+            const pulse = 1 + Math.sin(gameTime * (2 + currentSpeed * 0.5)) * 0.1;
+            playerCore.scale.set(pulse, pulse, pulse);
+            player.children.forEach(child => { 
+                if(child.userData.rotSpeed) child.rotation.z += child.userData.rotSpeed * dt * 60; 
             });
         }
 
-        function checkCollisions() {
-            const playerBox = new THREE.Box3().setFromObject(player);
-            // MODIFIED: Expand the collision box slightly (from -0.1 to +0.1) 
-            // to ensure reliable hits at high speeds (fixing ghosting/tunneling)
-            playerBox.expandByScalar(0.1); 
-
+        function checkCollisions(dt) {
+            const playerBox = new THREE.Box3().setFromObject(player).expandByScalar(0.1); 
             for (let i = crystals.length - 1; i >= 0; i--) {
                 const cry = crystals[i];
-                
-                cry.position.z += currentSpeed;
-                cry.rotation.x += cry.userData.rotSpeed.x;
-                cry.rotation.y += cry.userData.rotSpeed.y;
-                cry.rotation.z += cry.userData.rotSpeed.z;
+                cry.position.z += currentSpeed * dt * 60;
+                cry.rotation.x += cry.userData.rotSpeed.x * dt * 60; 
+                cry.rotation.y += cry.userData.rotSpeed.y * dt * 60; 
+                cry.rotation.z += cry.userData.rotSpeed.z * dt * 60;
 
-                const cryBox = new THREE.Box3().setFromObject(cry);
-                
-                if (cryBox.intersectsBox(playerBox)) {
+                if (new THREE.Box3().setFromObject(cry).intersectsBox(playerBox)) {
                     catchCrystal(cry, i);
-                } 
-                else if (cry.position.z > 10) {
+                } else if (cry.position.z > 10) {
                     missCrystal(cry, i);
                 }
             }
@@ -903,24 +787,17 @@
             createScatteredImpact(mesh.position, mesh.material.color);
             scene.remove(mesh);
             crystals.splice(index, 1);
-            
             crystalsCaught++;
-            updateHUD();
-            calculateDifficulty();
-            
-            shakeIntensity = 0.6; 
-            
-            // --- SEAMLESS TRANSITION (No gap) ---
-            nextSpawnCooldown = 1; 
-            
-            // Direct Milestone Check
-            if (crystalsCaught % 20 === 0 && crystalsCaught < 100) {
-                const milestoneIndex = (crystalsCaught / 20) - 1;
-                if (milestoneIndex >= 0 && milestoneIndex < ACHIEVEMENT_TITLES.length) {
-                    showMessage(ACHIEVEMENT_TITLES[milestoneIndex], ACHIEVEMENT_SUBS[milestoneIndex], 1500);
-                }
-            } 
+            updateHUD(); calculateDifficulty();
+            shakeIntensity = 0.6; nextSpawnCooldown = 1; 
 
+            if (crystalsCaught === 100) {
+                isAscending = true;
+                setTimeout(finishGame, 2000);
+            } else if (crystalsCaught % 20 === 0) {
+                const idx = (crystalsCaught / 20) - 1;
+                showMessage(ACHIEVEMENT_TITLES[idx], ACHIEVEMENT_SUBS[idx], 1500);
+            }
             checkWinCondition();
         }
 
@@ -929,70 +806,40 @@
             crystals.splice(index, 1);
             renderer.setClearColor(CONFIG.colors.neonRed, 0.3);
             setTimeout(() => renderer.setClearColor(CONFIG.colors.void, 0), 100);
-            
-            // --- SEAMLESS TRANSITION (No gap) ---
-            nextSpawnCooldown = 1;
-            
-            checkWinCondition();
+            nextSpawnCooldown = 1; checkWinCondition();
         }
 
         function createScatteredImpact(pos, color) {
-            const particleCount = 40;
+            const count = 40;
             const geo = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const velocities = [];
-
-            for(let i=0; i<particleCount; i++) {
-                positions[i*3] = pos.x;
-                positions[i*3+1] = pos.y;
-                positions[i*3+2] = pos.z;
-                
-                const v = new THREE.Vector3(
-                    (Math.random() - 0.5),
-                    (Math.random() - 0.5),
-                    (Math.random() - 0.5)
-                ).normalize().multiplyScalar(Math.random() * 2 + 1); 
-                velocities.push(v);
+            const positions = new Float32Array(count * 3);
+            const vels = [];
+            for(let i=0; i<count; i++) {
+                positions[i*3] = pos.x; positions[i*3+1] = pos.y; positions[i*3+2] = pos.z;
+                vels.push(new THREE.Vector3((Math.random()-0.5), (Math.random()-0.5), (Math.random()-0.5)).normalize().multiplyScalar(Math.random()*2+1));
             }
-            
             geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const mat = new THREE.PointsMaterial({ 
-                color: color, 
-                size: 0.4, 
-                transparent: true, 
-                opacity: 1.0,
-                blending: THREE.AdditiveBlending
-            });
-            
-            const particles = new THREE.Points(geo, mat);
-            particles.userData = { velocities, life: 1.0, type: 'scatter' };
-            scene.add(particles);
-            particleSystems.push(particles);
+            const ps = new THREE.Points(geo, new THREE.PointsMaterial({ color: color, size: 0.4, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
+            ps.userData = { velocities: vels, life: 1.0, type: 'scatter' };
+            scene.add(ps); particleSystems.push(ps);
         }
 
-        function updateParticles() {
-            // Calculate decay based on speed: Faster game = Faster fade out
-            const decayRate = 0.03 + (currentSpeed * 0.025);
-
+        function updateParticles(dt) {
+            const decay = (0.03 + (currentSpeed * 0.025)) * dt * 60;
             for(let i=particleSystems.length-1; i>=0; i--) {
                 const ps = particleSystems[i];
-                ps.userData.life -= decayRate;
-
+                ps.userData.life -= decay;
                 if (ps.userData.type === 'scatter') {
-                    const positions = ps.geometry.attributes.position.array;
+                    const pos = ps.geometry.attributes.position.array;
                     for(let j=0; j<ps.userData.velocities.length; j++) {
-                        positions[j*3] += ps.userData.velocities[j].x;
-                        positions[j*3+1] += ps.userData.velocities[j].y;
-                        positions[j*3+2] += ps.userData.velocities[j].z;
+                        pos[j*3] += ps.userData.velocities[j].x * dt * 60; 
+                        pos[j*3+1] += ps.userData.velocities[j].y * dt * 60; 
+                        pos[j*3+2] += ps.userData.velocities[j].z * dt * 60;
                     }
                     ps.geometry.attributes.position.needsUpdate = true;
                     ps.material.opacity = ps.userData.life;
                 }
-
-                if(ps.userData.life <= 0) {
-                    scene.remove(ps);
-                    particleSystems.splice(i, 1);
-                }
+                if(ps.userData.life <= 0) { scene.remove(ps); particleSystems.splice(i, 1); }
             }
         }
 
@@ -1001,230 +848,158 @@
             const pct = (crystalsCaught / CONFIG.totalCrystals) * 100;
             const fill = document.getElementById('awareness-fill');
             fill.style.width = pct + "%";
-            
-            let color;
-            if (currentStage === 2) color = CONFIG.colors.neonRed;
-            else if (currentStage === 1) color = CONFIG.colors.white; // White for Purity
-            else color = CONFIG.colors.neonBlue;
-            
-            let colorHex = "#" + color.toString(16).padStart(6, '0');
-            
-            fill.style.background = colorHex;
-            fill.style.boxShadow = `0 0 10px ${colorHex}`;
-            document.querySelector('.counter-big').style.textShadow = `0 0 20px ${colorHex}`;
+            let color = [CONFIG.colors.neonBlue, CONFIG.colors.white, CONFIG.colors.neonRed][currentStage < 0 ? 0 : currentStage];
+            let hex = "#" + color.toString(16).padStart(6, '0');
+            fill.style.background = hex; fill.style.boxShadow = `0 0 10px ${hex}`;
+            document.querySelector('.counter-big').style.textShadow = `0 0 20px ${hex}`;
         }
 
         function showMessage(title, sub, dur) {
             const el = document.getElementById('central-message');
             document.getElementById('msg-title').innerText = title;
             document.getElementById('msg-sub').innerText = sub;
-            el.style.opacity = 0.6; // Reduced Opacity
-            setTimeout(() => el.style.opacity = 0, dur);
+            el.style.opacity = 0.6; setTimeout(() => el.style.opacity = 0, dur);
         }
 
-        function checkWinCondition() {
-            if (crystalsSpawned === CONFIG.totalCrystals && crystals.length === 0) {
-                finishGame();
-            }
-        }
+        function checkWinCondition() { if (crystalsSpawned === CONFIG.totalCrystals && crystals.length === 0 && !isAscending) finishGame(); }
 
         function finishGame() {
-            isPlaying = false;
-            
-            // Release pointer lock on game end
+            isPlaying = false; 
             document.exitPointerLock();
+            const screen = document.getElementById('end-screen');
+            screen.style.display = 'flex';
+            setTimeout(() => screen.style.opacity = 1, 100);
 
-            const endScreen = document.getElementById('end-screen');
-            const endTitle1 = document.getElementById('end-title-1');
-            const endTitle2 = document.getElementById('end-title-2');
-            const endMsg = document.getElementById('end-message');
+            const t1 = document.getElementById('end-title-1');
+            const t2 = document.getElementById('end-title-2');
+            const msg = document.getElementById('end-message');
+            const ai = document.getElementById('ai-insight');
+            const cortexBtn = document.getElementById('connect-cortex-btn');
             const restartBtn = document.getElementById('restart-btn');
-            const aiText = document.getElementById('ai-insight');
-
-            endScreen.style.display = 'flex';
-            endScreen.style.opacity = 0; 
-            setTimeout(() => endScreen.style.opacity = 1, 100);
 
             if (crystalsCaught === 100) {
-                endTitle1.innerText = "ACCESS";
-                endTitle2.innerText = "GRANTED";
+                t1.innerText = "ASCENSION"; t2.innerText = "ACHIEVED";
+                t1.style.webkitTextFillColor = "#fff"; t2.style.webkitTextFillColor = "#ffd700";
+                msg.innerHTML = `<span style="color:#ffd700; font-size: 24px; letter-spacing: 5px;">SOURCE CONNECTED</span>`;
+                ai.innerHTML = `WELCOME TO THE CORE TEAM.<br>THE VYZVERSE IS YOURS.`;
                 
-                // Success styling
-                endTitle1.style.background = "none";
-                endTitle1.style.webkitBackgroundClip = "";
-                endTitle1.style.webkitTextFillColor = "#ffd700"; 
-                endTitle2.style.background = "none";
-                endTitle2.style.webkitBackgroundClip = "";
-                endTitle2.style.webkitTextFillColor = "#ffd700";
-
-                endMsg.innerHTML = `
-                    <span style="color:#ffd700; font-size: 20px;">ACCESS PROTOCOL COMPLETE: 100%</span><br><br>
-                    Welcome to VYZ Interstellar. Your focus has been validated.
-                `;
-                
-                // --- FOUNDER INVITATION ---
-                aiText.innerHTML = `
-                    <p style="color:#00ffff; margin-bottom: 5px; font-weight: 700; text-transform: uppercase;">
-                        Founder's Channel Activated
-                    </p>
-                    <p style="font-style: italic; font-size: 16px; margin-top: 10px;">
-                        "Congratulations on achieving absolute synchronization. Your success journey proves you have the focus required for the VYZ Interstellar Core Team. Contact me directly to discuss your future role."
-                    </p>
-                    <p style="font-weight: 700; margin-top: 20px;">
-                        Email: <a href="mailto:founder@vyzinterstellar.com" style="color: #ffd700; text-decoration: underline;">founder@vyzinterstellar.com</a>
-                    </p>
-                `;
-                // --- END FOUNDER INVITATION ---
-
-                restartBtn.innerText = "Re-Initiate Protocol";
-                
+                cortexBtn.style.display = 'block';
+                restartBtn.className = 'secondary-btn';
+                restartBtn.innerText = 'Re-Initiate Protocol';
             } else {
-                // Failure styling
-                endTitle1.innerText = "SEQUENCE";
-                endTitle2.innerText = "INCOMPLETE";
+                t1.innerText = "SEQUENCE"; t2.innerText = "INCOMPLETE";
+                t1.style.webkitTextFillColor = "#fff"; t2.style.webkitTextFillColor = "#fff";
+                msg.innerHTML = `<span class="lore-text">FRAGMENTS COLLECTED: <b style="color:#ff0033">${crystalsCaught}</b> / 100</span>`;
+                ai.innerText = "MORE FOCUS REQUIRED.";
                 
-                endTitle1.style.background = "none";
-                endTitle1.style.webkitTextFillColor = "#fff";
-                endTitle2.style.background = "none";
-                endTitle2.style.webkitTextFillColor = "#fff";
-
-                endMsg.innerHTML = `
-                    Fragments Collected: <b style="color:#ff0033">${crystalsCaught}</b> / 100<br><br>
-                    PORTAL LOCKED. **MORE FOCUS REQUIRED.**
-                `;
-                restartBtn.innerText = "Re-Initiate";
-                aiText.innerText = "";
+                cortexBtn.style.display = 'none';
+                restartBtn.className = 'start-btn';
+                restartBtn.innerText = 'Re-Initiate Protocol';
             }
         }
 
         function animate() {
             requestAnimationFrame(animate);
+            const dt = clock.getDelta();
 
             if (!isPlaying) {
                 renderer.render(scene, camera);
-                // Tunnel lines rotate slowly in the background during intro/menu
-                if(tunnel) tunnel.rotation.z += 0.001; 
-                return;
+                if(tunnel) tunnel.rotation.z += 0.001 * dt * 60; return;
             }
-
-            gameTime += 0.01;
-
-            // --- SEQUENTIAL SPAWNING LOGIC (Seamless, Cooldown Controlled) ---
-            if (crystals.length === 0 && crystalsSpawned < CONFIG.totalCrystals) {
-                nextSpawnCooldown--;
-                if (nextSpawnCooldown <= 0) {
-                    spawnCrystal();
-                }
-            }
-
-
-            if (shakeIntensity > 0) {
-                camera.position.x = (Math.random() - 0.5) * shakeIntensity;
-                camera.position.y = (Math.random() - 0.5) * shakeIntensity; 
-                shakeIntensity -= 0.05;
-                if(shakeIntensity < 0) {
-                    shakeIntensity = 0;
-                    camera.position.x = 0;
-                    camera.position.y = 0; 
-                }
-            }
-
-            handlePlayer();
-            checkCollisions();
-            updateParticles();
             
-            tunnel.rotation.z += currentSpeed * 0.001;
+            gameTime += dt;
+            
+            if (isAscending) {
+                currentSpeed += 0.08; 
+                camera.fov -= 0.6;
+                camera.updateProjectionMatrix();
+                bloomPass.strength += 0.25;
+                tunnel.children.forEach(l => {
+                    l.material.color.lerp(new THREE.Color(CONFIG.colors.gold), 0.1);
+                    l.material.opacity = 1.0;
+                });
+            }
 
-            // BACKGROUND UPDATE (Speed dependent on collected fragments)
-            // 1. Space Debris - FAST
-            debrisObjects.forEach(obj => {
-                obj.position.z += currentSpeed * 2.0; 
-                obj.rotation.x += obj.userData.rotSpeed;
-                obj.rotation.y += obj.userData.rotSpeed;
-                if (obj.position.z > 10) obj.position.z = -800;
+            if (crystals.length === 0 && crystalsSpawned < CONFIG.totalCrystals && !isAscending) {
+                if (--nextSpawnCooldown <= 0) spawnCrystal();
+            }
+            
+            if (shakeIntensity > 0) {
+                camera.position.x = (Math.random()-0.5)*shakeIntensity; camera.position.y = (Math.random()-0.5)*shakeIntensity;
+                if((shakeIntensity -= 0.05 * dt * 60) <= 0) { camera.position.set(0,0,8); shakeIntensity = 0; }
+            }
+            
+            handlePlayer(dt); 
+            checkCollisions(dt); 
+            updateParticles(dt);
+            
+            tunnel.rotation.z += currentSpeed * 0.001 * dt * 60;
+            
+            debrisObjects.forEach(obj => { 
+                obj.position.z += currentSpeed * 2.0 * dt * 60; 
+                if (obj.position.z > 10) obj.position.z = -800; 
             });
-
-            // 2. Stars - MEDIUM FAST
+            
             if (starSystem) {
-                starSystem.rotation.z += 0.0001;
-                const positions = starSystem.geometry.attributes.position.array;
-                for(let i=2; i<positions.length; i+=3) {
-                    positions[i] += currentSpeed * 1.5; 
-                    if(positions[i] > 10) positions[i] = -1000; 
+                const pos = starSystem.geometry.attributes.position.array;
+                for(let i=2; i<pos.length; i+=3) { 
+                    pos[i] += currentSpeed * 1.5 * dt * 60; 
+                    if(pos[i] > 10) pos[i] = -1000; 
                 }
                 starSystem.geometry.attributes.position.needsUpdate = true;
             }
             
-            // 3. High Speed Particles - VERY FAST (Outside Tunnel)
             if (highSpeedParticles) {
-                const positions = highSpeedParticles.geometry.attributes.position.array;
-                for(let i=2; i<positions.length; i+=3) {
-                    positions[i] += currentSpeed * 5.0; 
-                    if(positions[i] > 10) positions[i] = -1000;
+                const pos = highSpeedParticles.geometry.attributes.position.array;
+                for(let i=2; i<pos.length; i+=3) { 
+                    pos[i] += currentSpeed * 5.0 * dt * 60; 
+                    if(pos[i] > 10) pos[i] = -1000; 
                 }
                 highSpeedParticles.geometry.attributes.position.needsUpdate = true;
             }
-
-            if(vyztor) {
-                vyztor.rotation.y += 0.005;
-                let color;
-                if (currentStage === 2) color = CONFIG.colors.neonRed;
-                else if (currentStage === 1) color = CONFIG.colors.white;
-                else color = CONFIG.colors.neonBlue;
-                vyztor.material.emissive.setHex(color);
+            
+            if(vyztor) { 
+                vyztor.rotation.y += 0.005 * dt * 60; 
+                let vColor = [CONFIG.colors.neonBlue, CONFIG.colors.white, CONFIG.colors.neonRed][currentStage < 0 ? 0 : currentStage];
+                if(isAscending) vColor = CONFIG.colors.gold;
+                vyztor.material.emissive.setHex(vColor); 
             }
-
+            
             composer.render();
         }
 
-        // --- Event Handlers (Automated Start in init, only restart button needed here) ---
-        
-        // ADDED: Listener for the initial start button
-        document.getElementById('initial-start-btn').addEventListener('click', () => {
-            // A user gesture has occurred, safe to request pointer lock
-            document.body.requestPointerLock(); 
+        // Action: Connect to Cortex
+        document.getElementById('connect-cortex-btn').addEventListener('click', () => {
+            const email = CONFIG.winnerEmail;
+            const subject = "Ready to enter the VYZ Interstellar Cortex";
             
-            // Hide and disable the button immediately
-            document.getElementById('initial-start-btn').style.opacity = 0;
-            document.getElementById('initial-start-btn').style.pointerEvents = 'none';
+            // 1. Copy to clipboard
+            const textArea = document.createElement("textarea");
+            textArea.value = email;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {}
+            document.body.removeChild(textArea);
 
+            // 2. Open Mail Client
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+        });
+
+        document.getElementById('initial-start-btn').addEventListener('click', () => {
+            document.body.requestPointerLock();
+            document.getElementById('initial-start-btn').style.display = 'none';
             startProtocol();
         });
 
-
         document.getElementById('restart-btn').addEventListener('click', () => {
-             // Request Pointer Lock for infinite scrolling experience
-             document.body.requestPointerLock();
-
-             document.getElementById('end-screen').style.opacity = 0;
-             setTimeout(() => document.getElementById('end-screen').style.display = 'none', 1000);
-             
-            crystals.forEach(c => scene.remove(c));
-            crystals = [];
-            particleSystems.forEach(p => scene.remove(p));
-            particleSystems = [];
-            crystalsSpawned = 0;
-            crystalsCaught = 0;
-            currentSpeed = CONFIG.baseSpeed;
-            currentStage = -1;
-            calculateDifficulty();
-            updateHUD();
-
-            // Reset draw range to zero for next play
-            tunnel.children.forEach(l => l.geometry.setDrawRange(0, tunnelMaxPoints));
-
-
-            // Reset mouse to center on restart
-            mouse.x = 0;
-            mouse.y = 0;
-
-            isPlaying = true;
-            // MODIFIED: Start the next crystal spawn immediately (1 frame delay) for constant action
-            nextSpawnCooldown = 1;
+            document.body.requestPointerLock();
+            document.getElementById('end-screen').style.display = 'none';
+            startProtocol();
         });
 
         window.onload = init;
-
     </script>
 </body>
 </html>
